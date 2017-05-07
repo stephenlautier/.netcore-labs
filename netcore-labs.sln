@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26403.7
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.SimpleDockerApi", "simple-docker-api\Slabs.SimpleDockerApi\Slabs.SimpleDockerApi.csproj", "{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "simple-docker-api\docker-compose.dcproj", "{40BE1B91-7D52-48C2-970A-A2BEE7C15902}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061}.Release|Any CPU.Build.0 = Release|Any CPU
+		{40BE1B91-7D52-48C2-970A-A2BEE7C15902}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40BE1B91-7D52-48C2-970A-A2BEE7C15902}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40BE1B91-7D52-48C2-970A-A2BEE7C15902}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40BE1B91-7D52-48C2-970A-A2BEE7C15902}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

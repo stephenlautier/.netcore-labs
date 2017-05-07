@@ -1,0 +1,24 @@
+{
+  "name": "@sllabs/orleans",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "silo": "dotnet run -p ./SLlabs.SiloHost/SiloHost.csproj",
+    "client": "dotnet run -p ./SLlabs.ConsoleClient/SLlabs.ConsoleClient.csproj",
+    "web": "cd SLlabs.Web/ && dotnet run"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stephenlautier/labs-orleans.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stephenlautier/labs-orleans/issues"
+  },
+  "homepage": "https://github.com/stephenlautier/labs-orleans#readme"
+}
