@@ -6,3 +6,7 @@ services:
     build:
       context: ./Slabs.SimpleDockerApi
       dockerfile: Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    ports:
+      - "5010:80"

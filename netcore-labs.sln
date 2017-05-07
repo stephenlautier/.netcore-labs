@@ -7,6 +7,19 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.SimpleDockerApi", "si
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "simple-docker-api\docker-compose.dcproj", "{40BE1B91-7D52-48C2-970A-A2BEE7C15902}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{BEAA8484-EE17-4ADF-9A57-0A90456BC7CE}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		README.md = README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Simple Docker Api", "Simple Docker Api", "{A5AA226B-D953-40B8-BE7B-94E3E72737D2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{35FB403F-73F0-437B-8730-4CED80FB4704}"
+	ProjectSection(SolutionItems) = preProject
+		simple-docker-api\README.md = simple-docker-api\README.md
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +37,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061} = {A5AA226B-D953-40B8-BE7B-94E3E72737D2}
+		{40BE1B91-7D52-48C2-970A-A2BEE7C15902} = {A5AA226B-D953-40B8-BE7B-94E3E72737D2}
+		{35FB403F-73F0-437B-8730-4CED80FB4704} = {A5AA226B-D953-40B8-BE7B-94E3E72737D2}
 	EndGlobalSection
 EndGlobal
