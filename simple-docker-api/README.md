@@ -25,6 +25,12 @@ docker swarm init
 # deploy stack
 docker stack deploy -c docker-compose.yml slabs-api
 
+# when deploying using private repos
+docker stack deploy -c docker-compose.yml slabs-api --with-registry-auth
+
+# combine configs - this will take overrides etc...
+docker-compose config > stack.yml
+
 # scale service
 docker service scale slabs-api_api=3
 ```
