@@ -1,18 +1,15 @@
 {
-  "name": "@sllabs/orleans",
+  "name": "@slabs/netcore",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "dependencies": {},
   "devDependencies": {},
   "scripts": {
-    "silo": "dotnet run -p ./SLlabs.SiloHost/SiloHost.csproj",
-    "client": "dotnet run -p ./SLlabs.ConsoleClient/SLlabs.ConsoleClient.csproj",
-    "web": "cd SLlabs.Web/ && dotnet run"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/stephenlautier/labs-orleans.git"
+    "url": "git+https://github.com/stephenlautier/.netcorelabs.git"
   },
   "keywords": [],
   "author": "",

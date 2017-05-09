@@ -2,7 +2,7 @@ version: "3"
 
 services:
   api:
-    image: slabs.simpledockerapi
+    image: stephenlautier/slabs-simple-api
     build:
       context: ./Slabs.SimpleDockerApi
       dockerfile: Dockerfile

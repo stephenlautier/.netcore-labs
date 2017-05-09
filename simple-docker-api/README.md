@@ -11,6 +11,9 @@ docker-compose up
 
 # rebuild runtime image
 docker-compose build
+
+# publishes image(s) to docker repository
+docker-compose push
 ```
 
 ## Swarm Commands
