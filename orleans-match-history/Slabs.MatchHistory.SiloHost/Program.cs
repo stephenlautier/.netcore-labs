@@ -23,6 +23,7 @@ namespace Slabs.MatchHistory.SiloHost
 			var loggerFactory = new LoggerFactory();
 
 			var serilog = new LoggerConfiguration()
+				.Enrich.FromLogContext()
 				.MinimumLevel.Debug()
 				.WriteTo.ColoredConsole()
 				.CreateLogger();
@@ -32,9 +33,10 @@ namespace Slabs.MatchHistory.SiloHost
 					.CreateLogger<Program>();
 
 			logger.LogInformation("Starting silo... Env={environment} Machine={machine}", environment, Environment.MachineName);
-
-			Console.WriteLine("Hello World!");
+			logger.LogDebug("Press [Ctrl]-C to stop...");
 			Console.ReadKey();
+
+			logger.LogInformation("Shutting down silo...");
 		}
 	}
 }
