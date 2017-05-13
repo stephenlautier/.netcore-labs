@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26430.4
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slabs.MatchHistory.Web", "Slabs.MatchHistory.Web\Slabs.MatchHistory.Web.csproj", "{56550EAA-8F4F-4317-9197-77DFB1EFDFC2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Web", "Slabs.MatchHistory.Web\Slabs.MatchHistory.Web.csproj", "{56550EAA-8F4F-4317-9197-77DFB1EFDFC2}"
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{B9F12D5B-2F16-48F8-B95B-0E0308B3E54B}"
 EndProject
@@ -12,13 +12,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{0936E2AB
 		package.json = package.json
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slabs.MatchHistory.Game.Contracts", "..\Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj", "{000DB5ED-C6A3-4C24-BA1D-FCC34B7142B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Contracts", "..\Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj", "{000DB5ED-C6A3-4C24-BA1D-FCC34B7142B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slabs.MatchHistory.Game.Grains", "Slabs.MatchHistory.Game.Grains\Slabs.MatchHistory.Game.Grains.csproj", "{AAA5E95E-2ACA-4172-A168-5E1BF7539B0D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Grains", "Slabs.MatchHistory.Game.Grains\Slabs.MatchHistory.Game.Grains.csproj", "{AAA5E95E-2ACA-4172-A168-5E1BF7539B0D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cluster Server", "Cluster Server", "{C2B40F8A-D91C-4465-9B7B-307F4A710B0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slabs.MatchHistory.SiloHost", "Slabs.MatchHistory.SiloHost\Slabs.MatchHistory.SiloHost.csproj", "{C05AFEB6-21A0-4045-B60B-2D7125EB4B41}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Silo", "Slabs.MatchHistory.SiloHost\Slabs.MatchHistory.Silo.csproj", "{C05AFEB6-21A0-4045-B60B-2D7125EB4B41}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
