@@ -1,0 +1,8 @@
+version: '2'
+
+services:
+  slabs.matchhistory.web:
+    image: slabs.matchhistory.web
+    build:
+      context: ./Slabs.MatchHistory.Web
+      dockerfile: Dockerfile

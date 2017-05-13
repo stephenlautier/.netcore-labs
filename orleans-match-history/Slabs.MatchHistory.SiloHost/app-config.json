@@ -1,0 +1,16 @@
+{
+  "app": {
+    "name": "slabs.match-history"
+  },
+  "cluster": {
+    
+  },
+  "Logging": {
+    "IncludeScopes": false,
+    "LogLevel": {
+      "Default": "Debug",
+      "System": "Information",
+      "Microsoft": "Information"
+    }
+  }
+}
