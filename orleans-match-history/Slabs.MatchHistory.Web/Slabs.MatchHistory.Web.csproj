@@ -20,7 +20,7 @@
     <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj" />
+    <ProjectReference Include="..\Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj" />
   </ItemGroup>
 
 </Project>
