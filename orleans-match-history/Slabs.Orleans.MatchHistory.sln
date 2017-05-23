@@ -12,7 +12,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{0936E2AB
 		package.json = package.json
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Contracts", "..\Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj", "{000DB5ED-C6A3-4C24-BA1D-FCC34B7142B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Contracts", "Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj", "{000DB5ED-C6A3-4C24-BA1D-FCC34B7142B0}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Grains", "Slabs.MatchHistory.Game.Grains\Slabs.MatchHistory.Game.Grains.csproj", "{AAA5E95E-2ACA-4172-A168-5E1BF7539B0D}"
 EndProject
