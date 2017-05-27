@@ -8,6 +8,7 @@ namespace Slabs.SimpleDockerApi.Infrastructure
 	// ReSharper disable once ClassNeverInstantiated.Global
 	public class HealthMiddleware
 	{
+		// ReSharper disable once NotAccessedField.Local
 		private readonly RequestDelegate _next;
 
 		public HealthMiddleware(RequestDelegate next)
@@ -18,7 +19,7 @@ namespace Slabs.SimpleDockerApi.Infrastructure
 		public async Task Invoke(HttpContext httpContext)
 		{
 			httpContext.Response.StatusCode = (int)HttpStatusCode.OK;
-			await httpContext.Response.WriteAsync("Health status ok");
+			await httpContext.Response.WriteAsync("healthy");
 		}
 	}
 

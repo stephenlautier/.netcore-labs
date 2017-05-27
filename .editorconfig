@@ -3,7 +3,7 @@ root = true
 [*]
 indent_style = tab
 
-[*.{json,yml}]
+[*.{json,yml,csproj}]
 indent_size = 2
 indent_style = space
 
