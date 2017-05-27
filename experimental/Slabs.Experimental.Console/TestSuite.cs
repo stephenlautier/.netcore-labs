@@ -9,33 +9,66 @@ namespace Slabs.Experimental.ConsoleClient
 	{
 		private readonly string _name;
 
-		private List<ITest> Tests { get; }
-
+		private List<List<ITest>> TestGroups { get; }
+		private List<ITest> _currentParallelGroup;
 
 		public TestSuiteBuilder(string name)
 		{
-			Tests = new List<ITest>();
+			TestGroups = new List<List<ITest>>();
 			_name = name;
 		}
 
 		public TestSuite Build()
 		{
-			return new TestSuite(_name, Tests);
+			return new TestSuite(_name, TestGroups);
 		}
 
 		public TestSuiteBuilder Add(string key)
 		{
-			Tests.Add(new TestEntity { Key = key });
+			var group = new List<ITest>
+			{
+				ToTestEntity(key)
+			};
+			TestGroups.Add(group);
+			_currentParallelGroup = null;
 			return this;
+		}
+
+		public TestSuiteBuilder AddParallel(string key)
+		{
+			var testEntity = ToTestEntity(key);
+			if (_currentParallelGroup == null)
+			{
+				var group = new List<ITest>
+				{
+					testEntity
+				};
+				TestGroups.Add(group);
+				_currentParallelGroup = group;
+			}
+			else
+			{
+				_currentParallelGroup.Add(testEntity);
+			}
+			
+			return this;
+		}
+
+		TestEntity ToTestEntity(string key)
+		{
+			return new TestEntity
+			{
+				Key = key
+			};
 		}
 	}
 
 	internal class TestSuite
 	{
 		public string Name { get; }
-		private readonly List<ITest> _tests;
+		private readonly List<List<ITest>> _tests;
 
-		public TestSuite(string name, List<ITest> tests)
+		public TestSuite(string name, List<List<ITest>> tests)
 		{
 			Name = name;
 			_tests = tests;
@@ -44,9 +77,12 @@ namespace Slabs.Experimental.ConsoleClient
 		public Task Run()
 		{
 			Console.WriteLine($"[TestSuite] Running tests for '{Name}'");
-			foreach (var test in _tests)
+			foreach (var testGroup in _tests)
 			{
-				Console.WriteLine($"[TestSuite] Running {test.Key}");
+				foreach (var test in testGroup)
+				{
+					Console.WriteLine($"[TestSuite] Running {test.Key}");
+				}
 			}
 			return Task.CompletedTask;
 		}
@@ -54,7 +90,7 @@ namespace Slabs.Experimental.ConsoleClient
 
 	internal interface ITest
 	{
-		string Key { get; set; }
+		string Key { get; }
 		//Task Execute();
 	}
 

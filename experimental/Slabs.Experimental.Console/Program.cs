@@ -20,6 +20,9 @@ namespace Slabs.Experimental.ConsoleClient
 				.Add("get-teams")
 				.Add("add-teams")
 				.Add("get-team-detail")
+				.AddParallel("get-heroes")
+				.AddParallel("get-recent-matches")
+				.Add("reset")
 				.Build();
 
 			await gamingTestSuite.Run();
