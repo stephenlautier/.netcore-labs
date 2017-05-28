@@ -37,6 +37,8 @@ namespace Slabs.Experimental.ConsoleClient
 		public async Task<List<TestResult>> Run()
 		{
 			_logger.LogInformation("Running test suite {Name} ({total})", Name, TotalTestsCount);
+			var scope = _serviceProvider.CreateScope();
+			
 			int counter = 1;
 			foreach (var testGroup in _tests)
 			{
@@ -51,7 +53,8 @@ namespace Slabs.Experimental.ConsoleClient
 						State = TestStateType.Executing
 					};
 					_results.Add(result);
-					var testUnit = (ITest)ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, testEntity.Type);
+					
+					var testUnit = (ITest)ActivatorUtilities.GetServiceOrCreateInstance(scope.ServiceProvider, testEntity.Type);
 					Task task = null;
 					try
 					{
