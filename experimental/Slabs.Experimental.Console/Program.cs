@@ -16,13 +16,17 @@ namespace Slabs.Experimental.ConsoleClient
 		private static async Task RunTestSuite()
 		{
 			Console.WriteLine("Init Test Suite...");
-			var gamingTestSuite = new TestSuiteBuilder("gaming")
+			
+			var gamingTestGroup = new TestGroupBuilder()
 				.Add<GetTeamsTest>("get-teams")
 				.Add<AddTeamsTest>("add-teams")
 				.Add<GetTeamDetailTest>("get-team-detail")
 				.AddParallel<GetHeroesTest>("get-heroes")
 				.AddParallel<GetMatchesTest>("get-matches")
-				.Add<ResetTest>("reset")
+				.Add<ResetTest>("reset");
+
+			var gamingTestSuite = new TestSuiteBuilder("gaming")
+				.Add(gamingTestGroup)
 				.Build();
 
 			await gamingTestSuite.Run();
