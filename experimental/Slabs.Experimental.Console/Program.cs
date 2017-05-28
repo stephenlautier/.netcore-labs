@@ -1,9 +1,8 @@
-﻿using Slabs.Experimental.ConsoleClient.Tests;
-using System;
-using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Slabs.Experimental.ConsoleClient.Testify;
+using System;
 
 namespace Slabs.Experimental.ConsoleClient
 {

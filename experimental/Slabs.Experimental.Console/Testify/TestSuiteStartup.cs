@@ -2,7 +2,7 @@
 using Slabs.Experimental.ConsoleClient.Tests;
 using System.Threading.Tasks;
 
-namespace Slabs.Experimental.ConsoleClient
+namespace Slabs.Experimental.ConsoleClient.Testify
 {
 	public class TestSuiteStartup
 	{

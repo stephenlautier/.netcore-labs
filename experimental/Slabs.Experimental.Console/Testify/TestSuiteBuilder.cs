@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Slabs.Experimental.ConsoleClient
+namespace Slabs.Experimental.ConsoleClient.Testify
 {
 	/// <summary>
 	/// Builds a set of tests to be executed, which will be added to <see cref="TestSuiteBuilder"/>.

@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Slabs.Experimental.ConsoleClient
+namespace Slabs.Experimental.ConsoleClient.Testify
 {
 	public interface ITestSuite
 	{

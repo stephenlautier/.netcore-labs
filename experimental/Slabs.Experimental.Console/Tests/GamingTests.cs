@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Slabs.Experimental.ConsoleClient.Testify;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 
 namespace Slabs.Experimental.ConsoleClient.Tests
 {
