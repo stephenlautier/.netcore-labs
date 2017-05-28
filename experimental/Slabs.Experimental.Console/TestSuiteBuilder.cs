@@ -78,9 +78,12 @@ namespace Slabs.Experimental.ConsoleClient
 			_testGroups = new List<TestGroupBuilder>();
 		}
 
-		public TestSuiteBuilder Add(TestGroupBuilder testGroup)
+		public TestSuiteBuilder Add(TestGroupBuilder testGroup, int repeat = 1)
 		{
-			_testGroups.Add(testGroup);
+			if (repeat <= 1)
+				_testGroups.Add(testGroup);
+			else
+				_testGroups.AddRange(Enumerable.Repeat(testGroup, repeat));
 			return this;
 		}
 
@@ -89,6 +92,7 @@ namespace Slabs.Experimental.ConsoleClient
 			var testGroups = _testGroups.SelectMany(x => x.Build()).ToList();
 			return new TestSuite(_serviceProvider, _loggerFactory, _name, testGroups);
 		}
+
 	}
 
 	// ReSharper disable once ClassNeverInstantiated.Global
