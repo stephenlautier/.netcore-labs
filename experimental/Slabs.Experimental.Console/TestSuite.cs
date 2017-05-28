@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient
 {
-	internal class TestSuiteBuilder
+	public class TestSuiteBuilder
 	{
 		private readonly string _name;
 
@@ -63,7 +63,7 @@ namespace Slabs.Experimental.ConsoleClient
 		}
 	}
 
-	internal class TestSuite
+	public class TestSuite
 	{
 		public string Name { get; }
 		private readonly List<List<TestEntity>> _tests;
@@ -93,8 +93,15 @@ namespace Slabs.Experimental.ConsoleClient
 		}
 	}
 
-	internal interface ITest
+	/// <summary>
+	/// Describe a test unit.
+	/// </summary>
+	public interface ITest
 	{
+		/// <summary>
+		/// Method which gets executed by the runner.
+		/// </summary>
+		/// <returns></returns>
 		Task Execute();
 	}
 
