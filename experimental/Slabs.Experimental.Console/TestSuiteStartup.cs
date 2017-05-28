@@ -28,6 +28,7 @@ namespace Slabs.Experimental.ConsoleClient
 				.Add<ResetTest>("reset");
 			
 			var gamingTestSuite = _testSuiteBuilderFactory.Create("gaming")
+				.AddAuthTests()
 				.Add(gamingTestGroup)
 				.Build();
 
