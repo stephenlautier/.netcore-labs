@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient
@@ -9,12 +8,12 @@ namespace Slabs.Experimental.ConsoleClient
 	{
 		private readonly string _name;
 
-		private List<List<ITest>> TestGroups { get; }
-		private List<ITest> _currentParallelGroup;
+		private List<List<TestEntity>> TestGroups { get; }
+		private List<TestEntity> _currentParallelGroup;
 
 		public TestSuiteBuilder(string name)
 		{
-			TestGroups = new List<List<ITest>>();
+			TestGroups = new List<List<TestEntity>>();
 			_name = name;
 		}
 
@@ -23,23 +22,23 @@ namespace Slabs.Experimental.ConsoleClient
 			return new TestSuite(_name, TestGroups);
 		}
 
-		public TestSuiteBuilder Add(string key)
+		internal TestSuiteBuilder Add<TTest>(string key) where TTest : ITest, new()
 		{
-			var group = new List<ITest>
+			var group = new List<TestEntity>
 			{
-				ToTestEntity(key)
+				ToTestEntity(key, typeof(TTest))
 			};
 			TestGroups.Add(group);
 			_currentParallelGroup = null;
 			return this;
 		}
-
-		public TestSuiteBuilder AddParallel(string key)
+		
+		public TestSuiteBuilder AddParallel<TTest>(string key) where TTest : ITest, new()
 		{
-			var testEntity = ToTestEntity(key);
+			var testEntity = ToTestEntity(key, typeof(TTest));
 			if (_currentParallelGroup == null)
 			{
-				var group = new List<ITest>
+				var group = new List<TestEntity>
 				{
 					testEntity
 				};
@@ -54,11 +53,12 @@ namespace Slabs.Experimental.ConsoleClient
 			return this;
 		}
 
-		TestEntity ToTestEntity(string key)
+		static TestEntity ToTestEntity(string key, Type type)
 		{
 			return new TestEntity
 			{
-				Key = key
+				Key = key,
+				Type = type
 			};
 		}
 	}
@@ -66,37 +66,43 @@ namespace Slabs.Experimental.ConsoleClient
 	internal class TestSuite
 	{
 		public string Name { get; }
-		private readonly List<List<ITest>> _tests;
+		private readonly List<List<TestEntity>> _tests;
 
-		public TestSuite(string name, List<List<ITest>> tests)
+		public TestSuite(string name, List<List<TestEntity>> tests)
 		{
 			Name = name;
 			_tests = tests;
 		}
 
-		public Task Run()
+		public async Task Run()
 		{
-			Console.WriteLine($"[TestSuite] Running tests for '{Name}'");
+			Console.WriteLine($"[TestSuite] Running test suite '{Name}'");
 			foreach (var testGroup in _tests)
 			{
-				foreach (var test in testGroup)
+				IList<Task> promises = new List<Task>();
+				foreach (var testEntity in testGroup)
 				{
-					Console.WriteLine($"[TestSuite] Running {test.Key}");
+					Console.WriteLine($"[TestSuite] Running '{testEntity.Key}'");
+					var test = (ITest)Activator.CreateInstance(testEntity.Type);
+					var task = test.Execute();
+					promises.Add(task);
 				}
+				// parallized test groups
+				await Task.WhenAll(promises);
 			}
-			return Task.CompletedTask;
 		}
 	}
 
 	internal interface ITest
 	{
-		string Key { get; }
-		//Task Execute();
+		//string Key { get; }
+		Task Execute();
 	}
 
-	internal class TestEntity : ITest
+	internal class TestEntity
 	{
 		public string Key { get; set; }
+		public Type Type { get; set; }
 	}
 
 }
