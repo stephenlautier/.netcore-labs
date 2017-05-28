@@ -17,7 +17,7 @@ namespace Slabs.Experimental.ConsoleClient
 			_name = name;
 		}
 
-		public TestSuite Build()
+		public ITestSuite Build()
 		{
 			return new TestSuite(_name, TestGroups);
 		}
@@ -63,12 +63,18 @@ namespace Slabs.Experimental.ConsoleClient
 		}
 	}
 
-	public class TestSuite
+	public interface ITestSuite
+	{
+		string Name { get; }
+		Task Run();
+	}
+
+	public class TestSuite : ITestSuite
 	{
 		public string Name { get; }
 		private readonly List<List<TestEntity>> _tests;
 
-		public TestSuite(string name, List<List<TestEntity>> tests)
+		internal TestSuite(string name, List<List<TestEntity>> tests)
 		{
 			Name = name;
 			_tests = tests;
