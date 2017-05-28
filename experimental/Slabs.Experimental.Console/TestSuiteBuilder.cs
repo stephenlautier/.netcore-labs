@@ -47,7 +47,7 @@ namespace Slabs.Experimental.ConsoleClient
 		}
 
 		/// <summary>
-		/// Builds tasks for the <see cref="TestGroupBuilder"/> - generally should be used by the <see cref="TestSuiteBuilder"/> to compose TestGroups.
+		/// Builds tasks for the <see cref="TestGroupBuilder"/> - generally used by the <see cref="TestSuiteBuilder"/> itself to compose Test Groups.
 		/// </summary>
 		/// <returns></returns>
 		public IEnumerable<List<TestEntity>> Build() => _testGroups;
