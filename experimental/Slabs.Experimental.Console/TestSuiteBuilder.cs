@@ -86,8 +86,8 @@ namespace Slabs.Experimental.ConsoleClient
 
 		public ITestSuite Build()
 		{
-			var testGroups = _testGroups.SelectMany(x => x.Build());
-			return new TestSuite(_name, _serviceProvider, testGroups, _loggerFactory);
+			var testGroups = _testGroups.SelectMany(x => x.Build()).ToList();
+			return new TestSuite(_serviceProvider, _loggerFactory, _name, testGroups);
 		}
 	}
 

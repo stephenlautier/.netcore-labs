@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient
@@ -15,23 +16,27 @@ namespace Slabs.Experimental.ConsoleClient
 	public class TestSuite : ITestSuite
 	{
 		public string Name { get; }
+		public int TotalTestsCount { get; }
 		private readonly IServiceProvider _serviceProvider;
-		private readonly IEnumerable<List<TestEntity>> _tests;
+		private readonly ICollection<List<TestEntity>> _tests;
 		private readonly ILogger _logger;
 
-		internal TestSuite(string name, IServiceProvider serviceProvider, IEnumerable<List<TestEntity>> tests, ILoggerFactory loggerFactory)
+		internal TestSuite(IServiceProvider serviceProvider, ILoggerFactory loggerFactory, string name, ICollection<List<TestEntity>> tests)
 		{
-			Name = name;
 			_serviceProvider = serviceProvider;
-			_tests = tests;
 			_logger = loggerFactory.CreateLogger($"[TestSuite::{name}]");
+			Name = name;
+			_tests = tests;
+			TotalTestsCount = tests.Sum(x => x.Count);
 		}
 
 		public async Task Run()
 		{
-			_logger.LogInformation("Running test suite {Name}", Name);
+			_logger.LogInformation("Running test suite {Name} ({total})", Name, TotalTestsCount);
+			int counter = 1;
 			foreach (var testGroup in _tests)
 			{
+				_logger.LogInformation("{Name} ({counter}/{total})", Name, counter, TotalTestsCount);
 				var promises = new List<Task>();
 				foreach (var testEntity in testGroup)
 				{
@@ -39,6 +44,7 @@ namespace Slabs.Experimental.ConsoleClient
 					var testUnit = (ITest)ActivatorUtilities.GetServiceOrCreateInstance(_serviceProvider, testEntity.Type);
 					var task = testUnit.Execute();
 					promises.Add(task);
+					counter++;
 				}
 				// parallized test groups
 				await Task.WhenAll(promises);
