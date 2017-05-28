@@ -88,7 +88,7 @@ namespace Slabs.Experimental.ConsoleClient
 						{
 							_logger.LogError("Test {Name} failed", result.Name);
 							result.State = TestStateType.Failed;
-							result.Exception = promise.Exception;
+							result.Exception = promise.Exception?.InnerException ?? promise.Exception;
 						} else if (promise.IsCompleted)
 						{
 							result.State = TestStateType.Success;
