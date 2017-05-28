@@ -22,20 +22,20 @@ namespace Slabs.Experimental.ConsoleClient
 			return new TestSuite(_name, TestGroups);
 		}
 
-		internal TestSuiteBuilder Add<TTest>(string key) where TTest : ITest, new()
+		internal TestSuiteBuilder Add<TTest>(string name) where TTest : ITest, new()
 		{
 			var group = new List<TestEntity>
 			{
-				ToTestEntity(key, typeof(TTest))
+				ToTestEntity(name, typeof(TTest))
 			};
 			TestGroups.Add(group);
 			_currentParallelGroup = null;
 			return this;
 		}
 		
-		public TestSuiteBuilder AddParallel<TTest>(string key) where TTest : ITest, new()
+		public TestSuiteBuilder AddParallel<TTest>(string name) where TTest : ITest, new()
 		{
-			var testEntity = ToTestEntity(key, typeof(TTest));
+			var testEntity = ToTestEntity(name, typeof(TTest));
 			if (_currentParallelGroup == null)
 			{
 				var group = new List<TestEntity>
@@ -57,7 +57,7 @@ namespace Slabs.Experimental.ConsoleClient
 		{
 			return new TestEntity
 			{
-				Key = key,
+				Name = key,
 				Type = type
 			};
 		}
@@ -82,7 +82,7 @@ namespace Slabs.Experimental.ConsoleClient
 				IList<Task> promises = new List<Task>();
 				foreach (var testEntity in testGroup)
 				{
-					Console.WriteLine($"[TestSuite] Running '{testEntity.Key}'");
+					Console.WriteLine($"[TestSuite] Running '{testEntity.Name}'");
 					var test = (ITest)Activator.CreateInstance(testEntity.Type);
 					var task = test.Execute();
 					promises.Add(task);
@@ -95,13 +95,12 @@ namespace Slabs.Experimental.ConsoleClient
 
 	internal interface ITest
 	{
-		//string Key { get; }
 		Task Execute();
 	}
 
 	internal class TestEntity
 	{
-		public string Key { get; set; }
+		public string Name { get; set; }
 		public Type Type { get; set; }
 	}
 
