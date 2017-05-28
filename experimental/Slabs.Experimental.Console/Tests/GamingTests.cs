@@ -13,10 +13,11 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 			_logger = logger;
 		}
 
-		public Task Execute()
+		public async Task Execute()
 		{
 			_logger.LogInformation("[{service}] Executing...", nameof(GetTeamsTest));
-			return Task.Delay(TimeSpan.FromSeconds(2));
+			await Task.Delay(TimeSpan.FromSeconds(2));
+			_logger.LogInformation("[{service}] complete", nameof(GetTeamsTest));
 		}
 	}
 
@@ -29,10 +30,10 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 			_logger = logger;
 		}
 
-		public Task Execute()
+		public async Task Execute()
 		{
 			_logger.LogInformation("[{service}] Executing...", nameof(AddTeamsTest));
-			return Task.CompletedTask;
+			await Task.Delay(TimeSpan.FromSeconds(1));
 		}
 	}
 
@@ -66,6 +67,7 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		{
 			_logger.LogInformation("[{service}] Executing...", nameof(GetHeroesTest));
 			await Task.Delay(TimeSpan.FromSeconds(2));
+			throw new Exception("Because it crashed ee");
 			_logger.LogInformation("[{service}] complete!", nameof(GetHeroesTest));
 		}
 	}
