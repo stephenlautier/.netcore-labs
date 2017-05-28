@@ -1,31 +1,53 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Slabs.Experimental.ConsoleClient.Tests
 {
 	public class GetTeamsTest : ITest
 	{
+		private readonly ILogger _logger;
+
+		public GetTeamsTest(ILogger<GetTeamsTest> logger)
+		{
+			_logger = logger;
+		}
+
 		public Task Execute()
 		{
-			Console.WriteLine($"[{nameof(GetTeamsTest)}] Executing...");
+			_logger.LogInformation("[{service}] Executing...", nameof(GetTeamsTest));
 			return Task.Delay(TimeSpan.FromSeconds(2));
 		}
 	}
 
 	public class AddTeamsTest : ITest
 	{
+		private readonly ILogger _logger;
+
+		public AddTeamsTest(ILogger<AddTeamsTest> logger)
+		{
+			_logger = logger;
+		}
+
 		public Task Execute()
 		{
-			Console.WriteLine($"[{nameof(AddTeamsTest)}] Executing...");
+			_logger.LogInformation("[{service}] Executing...", nameof(AddTeamsTest));
 			return Task.CompletedTask;
 		}
 	}
 
 	public class GetTeamDetailTest : ITest
 	{
+		private readonly ILogger _logger;
+
+		public GetTeamDetailTest(ILogger<AddTeamsTest> logger)
+		{
+			_logger = logger;
+		}
+
 		public Task Execute()
 		{
-			Console.WriteLine($"[{nameof(GetTeamDetailTest)}] Executing...");
+			_logger.LogInformation("[{service}] Executing...", nameof(GetTeamDetailTest));
 			return Task.CompletedTask;
 		}
 	}
@@ -33,30 +55,51 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 	// parallel
 	public class GetHeroesTest : ITest
 	{
+		private readonly ILogger _logger;
+
+		public GetHeroesTest(ILogger<GetHeroesTest> logger)
+		{
+			_logger = logger;
+		}
+
 		public async Task Execute()
 		{
-			Console.WriteLine($"[{nameof(GetHeroesTest)}] Executing...");
+			_logger.LogInformation("[{service}] Executing...", nameof(GetHeroesTest));
 			await Task.Delay(TimeSpan.FromSeconds(2));
-			Console.WriteLine($"[{nameof(GetHeroesTest)}] Complete!");
+			_logger.LogInformation("[{service}] complete!", nameof(GetHeroesTest));
 		}
 	}
 
 	// parallel
 	public class GetMatchesTest : ITest
 	{
+		private readonly ILogger _logger;
+
+		public GetMatchesTest(ILogger<GetMatchesTest> logger)
+		{
+			_logger = logger;
+		}
+
 		public async Task Execute()
 		{
-			Console.WriteLine($"[{nameof(GetMatchesTest)}] Executing...");
+			_logger.LogInformation("[{service}] Executing...", nameof(GetMatchesTest));
 			await Task.Delay(TimeSpan.FromSeconds(2));
-			Console.WriteLine($"[{nameof(GetMatchesTest)}] Complete!");
+			_logger.LogInformation("[{service}] complete!", nameof(GetMatchesTest));
 		}
 	}
 
 	public class ResetTest : ITest
 	{
+		private readonly ILogger _logger;
+
+		public ResetTest(ILogger<ResetTest> logger)
+		{
+			_logger = logger;
+		}
+
 		public Task Execute()
 		{
-			Console.WriteLine($"[{nameof(ResetTest)}] Executing...");
+			_logger.LogInformation("[{service}] Executing...", nameof(ResetTest));
 			return Task.CompletedTask;
 		}
 	}

@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,7 +18,7 @@ namespace Slabs.Experimental.ConsoleClient
 			_testGroups = new List<List<TestEntity>>();
 		}
 
-		public TestGroupBuilder Add<TTest>(string name) where TTest : ITest, new()
+		public TestGroupBuilder Add<TTest>(string name) where TTest : ITest
 		{
 			var group = new List<TestEntity>
 			{
@@ -28,7 +29,7 @@ namespace Slabs.Experimental.ConsoleClient
 			return this;
 		}
 
-		public TestGroupBuilder AddParallel<TTest>(string name) where TTest : ITest, new()
+		public TestGroupBuilder AddParallel<TTest>(string name) where TTest : ITest
 		{
 			var testEntity = ToTestEntity(name, typeof(TTest));
 			if (_currentParallelGroup == null)
@@ -65,11 +66,15 @@ namespace Slabs.Experimental.ConsoleClient
 	public class TestSuiteBuilder
 	{
 		private readonly string _name;
+		private readonly IServiceProvider _serviceProvider;
+		private readonly ILoggerFactory _loggerFactory;
 		private readonly List<TestGroupBuilder> _testGroups;
 
-		public TestSuiteBuilder(string name)
+		public TestSuiteBuilder(string name, IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
 		{
 			_name = name;
+			_serviceProvider = serviceProvider;
+			_loggerFactory = loggerFactory;
 			_testGroups = new List<TestGroupBuilder>();
 		}
 
@@ -82,8 +87,23 @@ namespace Slabs.Experimental.ConsoleClient
 		public ITestSuite Build()
 		{
 			var testGroups = _testGroups.SelectMany(x => x.Build());
-			return new TestSuite(_name, testGroups);
+			return new TestSuite(_name, _serviceProvider, testGroups, _loggerFactory);
 		}
+	}
+
+	// ReSharper disable once ClassNeverInstantiated.Global
+	public class TestSuiteBuilderFactory
+	{
+		private readonly IServiceProvider _serviceProvider;
+		private readonly ILoggerFactory _loggerFactory;
+
+		public TestSuiteBuilderFactory(IServiceProvider serviceProvider, ILoggerFactory loggerFactory)
+		{
+			_serviceProvider = serviceProvider;
+			_loggerFactory = loggerFactory;
+		}
+
+		public TestSuiteBuilder Create(string name) => new TestSuiteBuilder(name, _serviceProvider, _loggerFactory);
 	}
 
 	public class TestEntity

@@ -1,6 +1,9 @@
 ﻿using Slabs.Experimental.ConsoleClient.Tests;
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Slabs.Experimental.ConsoleClient
 {
@@ -8,32 +11,31 @@ namespace Slabs.Experimental.ConsoleClient
 	{
 		static void Main(string[] args)
 		{
-			RunTestSuite().Wait();
-			Console.WriteLine("Press any key to stop...");
+			var serilog = new LoggerConfiguration()
+				.Enrich.FromLogContext()
+				.MinimumLevel.Debug()
+				.WriteTo.ColoredConsole()
+				.CreateLogger();
+
+			var serviceProvider = new ServiceCollection()
+				.AddLogging()
+				.AddScoped<TestSuiteStartup>()
+				.AddSingleton<TestSuiteBuilderFactory>()
+				.BuildServiceProvider();
+
+			var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
+			loggerFactory.AddSerilog(serilog)
+				.AddDebug();
+
+			var logger = loggerFactory.CreateLogger<Program>();
+
+			var testSuiteStartup = serviceProvider.GetService<TestSuiteStartup>();
+			testSuiteStartup.Run().Wait();
+
+			logger.LogInformation("Press any key to stop...");
 			Console.ReadKey();
-		}
-
-		private static async Task RunTestSuite()
-		{
-			Console.WriteLine("Init Test Suite...");
-			
-			var gamingTestGroup = new TestGroupBuilder()
-				.Add<GetTeamsTest>("get-teams")
-				.Add<AddTeamsTest>("add-teams")
-				.Add<GetTeamDetailTest>("get-team-detail")
-				.AddParallel<GetHeroesTest>("get-heroes")
-				.AddParallel<GetMatchesTest>("get-matches")
-				.Add<ResetTest>("reset");
-
-			var gamingTestSuite = new TestSuiteBuilder("gaming")
-				.Add(gamingTestGroup)
-				.Build();
-
-			await gamingTestSuite.Run();
-			
 		}
 
 	}
 
-	
 }
