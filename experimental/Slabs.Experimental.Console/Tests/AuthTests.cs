@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
+using Slabs.Experimental.ConsoleClient.FluentHttp;
 
 namespace Slabs.Experimental.ConsoleClient.Tests
 {
@@ -21,30 +22,39 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 	{
 		private readonly ILogger _logger;
 		private readonly ISessionState _sessionState;
-		private string _authBaseUri = "http://staging.api.cpm-odin.com:1001";
 
-		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState)
+		private readonly FluentHttpClient _fluentHttpClient;
+		//private string _authBaseUri = "http://staging.api.cpm-odin.com:1001";
+
+		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState, HttpClientFactory httpClientFactory)
 		{
 			_logger = logger;
 			_sessionState = sessionState;
+			_fluentHttpClient = httpClientFactory.Get("auth");
 		}
 
 		public async Task Execute()
 		{
-			var httpClient = new HttpClient
-			{
-				BaseAddress = new Uri(_authBaseUri)
-			};
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			httpClient.Timeout = TimeSpan.FromSeconds(5);
-			var response = await httpClient.PostAsync("/api/auth/login", new JsonContent(new
+			//var httpClient = new HttpClient
+			//{
+			//	BaseAddress = new Uri(_authBaseUri)
+			//};
+			//httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+			//httpClient.Timeout = TimeSpan.FromSeconds(5);
+			var result = await _fluentHttpClient.Post<LoginResponse>("/api/auth/login", new
 			{
 				username = "test",
-				password = "test",
-			}));
-			response.EnsureSuccessStatusCode();
-			var responseContent = await response.Content.ReadAsStringAsync();
-			var result = JsonConvert.DeserializeObject<LoginResponse>(responseContent);
+				password = "test"
+			});
+
+			//var response = await httpClient.PostAsync("/api/auth/login", new JsonContent(new
+			//{
+			//	username = "test",
+			//	password = "test",
+			//}));
+			//response.EnsureSuccessStatusCode();
+			//var responseContent = await response.Content.ReadAsStringAsync();
+			//var result = JsonConvert.DeserializeObject<LoginResponse>(responseContent);
 
 			Check.That(result).IsNotNull();
 			Check.That(result.AccessToken).IsNotNull();

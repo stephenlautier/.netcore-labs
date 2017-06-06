@@ -21,6 +21,7 @@ namespace Slabs.Experimental.ConsoleClient
 				.AddScoped<TestSuiteStartup>()
 				.AddSingleton<TestSuiteBuilderFactory>()
 				.AddScoped<ISessionState, SessionState>()
+				.AddFluentHttp()
 				.BuildServiceProvider();
 
 			var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
