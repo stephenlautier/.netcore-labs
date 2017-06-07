@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
@@ -17,10 +15,8 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		public string Identifier { get; }
 		public string BaseUrl { get; }
 
-		private readonly Type _firstMiddleware;
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly IList<Type> _middlewares;
-
 
 		public FluentHttpClient(FluentHttpClientOptions options, IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
@@ -29,7 +25,6 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			_middlewares = options.Middleware;
 			Identifier = options.Identifier;
 			BaseUrl = options.BaseUrl;
-			_firstMiddleware = _middlewares.FirstOrDefault();
 		}
 
 		public async Task<T> Post<T>(string url, object data)
@@ -70,7 +65,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 				Method = "GET"
 			};
 
-			var response = await _middlewareRunner.Run(_firstMiddleware, request, r => GetAsHttp<T>(r.Url));
+			var response = await _middlewareRunner.Run<T>(_middlewares, request, async r => await GetAsHttp<T>(r.Url));
 			return (FluentHttpResponse<T>)response;
 		}
 
@@ -101,7 +96,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 	public interface IFluentHttpMiddlewareRunner
 	{
-		Task<IFluentHttpResponse> Run<T>(Type firstMiddleware, FluentHttpRequest request, Func<FluentHttpRequest, Task<FluentHttpResponse<T>>> send);
+		Task<IFluentHttpResponse> Run<T>(IList<Type> middleware, FluentHttpRequest request, FluentHttpRequestDelegate send);
 	}
 
 	public class FluentHttpMiddlewareRunner : IFluentHttpMiddlewareRunner
@@ -112,51 +107,33 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		{
 			_serviceProvider = serviceProvider;
 		}
-		
-		public async Task<IFluentHttpResponse> Run<T>(Type firstMiddleware, FluentHttpRequest request, Func<FluentHttpRequest, Task<FluentHttpResponse<T>>> send)
+
+		public async Task<IFluentHttpResponse> Run<T>(IList<Type> middleware, FluentHttpRequest request, FluentHttpRequestDelegate send)
 		{
-			async Task<IFluentHttpResponse> Next(FluentHttpRequest arg)
+			if (middleware.Count == 0)
+				return await send(request);
+
+			IFluentHttpResponse httpResult = null;
+			IFluentHttpMiddleware previousMiddleware = null;
+
+			for (int i = middleware.Count; i-- > 0;)
 			{
-				var result = await send(request);
-				return result;
+				var type = middleware[i];
+
+				var isLast = middleware.Count - 1 == i;
+				var isFirst = i == 0;
+				var next = isLast
+					? send
+					: previousMiddleware.Invoke;
+				var instance = (IFluentHttpMiddleware)ActivatorUtilities.CreateInstance(_serviceProvider, type, next);
+
+				if (isFirst)
+					httpResult = await instance.Invoke(request);
+				else
+					previousMiddleware = instance;
 			}
-			// todo: this wont handle multi middleware
-			var middleware = (IFluentHttpMiddleware)ActivatorUtilities.CreateInstance(_serviceProvider, firstMiddleware, (FluentHttpRequestDelegate)Next);
-			var httpResult = await middleware.Invoke(request);
 			return httpResult;
 		}
-
-
-		//public async Task<IFluentHttpResponse> Run<T>(IList<Type> middleware, FluentHttpRequest request, Func<FluentHttpRequest, Task<FluentHttpResponse<T>>> send)
-		//{
-		//	if (middleware.Count == 0)
-		//	{
-		//		return await Next(request);
-		//	}
-
-		//	IFluentHttpResponse httpResult = null;
-		//	for (int index = 0; index < middleware.Count; index++)
-		//	{
-		//		var type = middleware[index];
-		//		var next = middleware.ElementAt(index + 1);
-
-		//		var instance = (IFluentHttpMiddleware)ActivatorUtilities.CreateInstance(_serviceProvider, type, (FluentHttpRequestDelegate)Next);
-		//		httpResult = await instance.Invoke(request);
-		//	}
-		//	foreach (var type in middleware)
-		//	{
-		//		var instance = (IFluentHttpMiddleware)ActivatorUtilities.CreateInstance(_serviceProvider, type, (FluentHttpRequestDelegate)Next);
-		//		httpResult = await instance.Invoke(request);
-
-		//	}
-		//	return httpResult;
-
-		//	async Task<IFluentHttpResponse> Next(FluentHttpRequest arg)
-		//	{
-		//		var result = await send(request);
-		//		return result;
-		//	}
-		//}
 
 	}
 

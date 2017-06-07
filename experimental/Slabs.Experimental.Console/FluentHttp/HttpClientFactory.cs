@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
@@ -44,6 +42,11 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			var client = new FluentHttpClient(clientOptions, _serviceProvider, _middlewareRunner);
 
 			_clientsMap.Add(clientBuilder.Identifier, client);
+		}
+
+		public void Remove(string identity)
+		{
+			_clientsMap.Remove(identity);
 		}
 
 		public FluentHttpClient Get(string identifier)

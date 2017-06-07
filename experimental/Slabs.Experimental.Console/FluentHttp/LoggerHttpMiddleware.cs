@@ -18,9 +18,9 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 		public async Task<IFluentHttpResponse> Invoke(FluentHttpRequest request)
 		{
-			_logger.LogInformation("[LoggerFluentHttpMiddleware] Pre-request... [{method}] {url}", request.Method, request.Url);
+			_logger.LogInformation("Pre-request... [{method}] {url}", request.Method, request.Url);
 			var response = await _next(request);
-			_logger.LogInformation("[LoggerFluentHttpMiddleware] Post-request... {status}", response.StatusCode);
+			_logger.LogInformation("Post-request... {status}", response.StatusCode);
 			return response;
 		}
 	}
@@ -30,7 +30,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 		private readonly ILogger _logger;
 
-		public TimerHttpMiddleware(FluentHttpRequestDelegate next, ILogger<LoggerHttpMiddleware> logger)
+		public TimerHttpMiddleware(FluentHttpRequestDelegate next, ILogger<TimerHttpMiddleware> logger)
 		{
 			_next = next;
 			_logger = logger;
@@ -40,7 +40,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		{
 			var watch = Stopwatch.StartNew();
 			var response = await _next(request);
-			_logger.LogInformation("[TimerHttpMiddleware] {duration}", watch.Elapsed);
+			_logger.LogInformation("{duration}", watch.Elapsed);
 			return response;
 		}
 	}
