@@ -7,15 +7,28 @@ namespace Slabs.SimpleDockerApi.Controllers
 	public class AuthController : Controller
 	{
 
-		// POST api/login
-		[HttpPost("login")]
-		public IActionResult Post([FromBody]LoginInputModel value)
+		// POST api/auth/login
+		[HttpPost("[action]")]
+		public IActionResult Login([FromBody]LoginInputModel value)
 		{
 			var result = new LoginResponse
 			{
 				ExpiresIn = 5,
 				TokenType = "Basic",
 				AccessToken = Guid.NewGuid().ToString()
+			};
+
+			return Ok(result);
+		}
+		// POST api/auth/keep-alive
+		[HttpPatch("keep-alive")]
+		public IActionResult KeepAlive([FromBody]string token)
+		{
+			var result = new LoginResponse
+			{
+				ExpiresIn = 10,
+				TokenType = "Basic",
+				AccessToken = token
 			};
 
 			return Ok(result);
@@ -27,6 +40,11 @@ namespace Slabs.SimpleDockerApi.Controllers
 	{
 		public string Username { get; set; }
 		public string Password { get; set; }
+	}
+
+	public class KeepAliveInputModel
+	{
+		public string Token { get; set; }
 	}
 	public class LoginResponse
 	{
