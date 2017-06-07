@@ -29,7 +29,9 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 
 			var resultHttpMw = await _fluentHttpClient.GetAsHttpWithMiddleware<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
 			resultHttpMw.EnsureSuccessStatusCode();
-
+			
+			var timeTaken = resultHttpMw.GetTimeTaken();
+			Check.That(timeTaken).IsLessThan(TimeSpan.FromMilliseconds(250));
 			Check.That(result).IsNotNull();
 			Check.That(result.Id).IsStrictlyGreaterThan(0);
 			

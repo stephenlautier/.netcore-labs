@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		void EnsureSuccessStatusCode();
 		string ReasonPhrase { get; }
 		HttpResponseHeaders Headers { get; }
+		IDictionary<object, object> Items { get; set; }
 	}
 
 	public class FluentHttpResponse<T> : IFluentHttpResponse
@@ -39,7 +41,10 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		public void EnsureSuccessStatusCode() => _response.EnsureSuccessStatusCode();
 		public string ReasonPhrase => _response.ReasonPhrase;
 		public HttpResponseHeaders Headers => _response.Headers;
-
+		/// <summary>
+		/// Gets or sets a key/value collection that can be used to share data within the scope of this request/response.
+		/// </summary>
+		public IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
 	}
 
 	

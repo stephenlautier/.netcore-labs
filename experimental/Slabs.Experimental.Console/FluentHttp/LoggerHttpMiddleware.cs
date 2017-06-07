@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
@@ -40,8 +41,25 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		{
 			var watch = Stopwatch.StartNew();
 			var response = await _next(request);
-			_logger.LogInformation("{duration}", watch.Elapsed);
+			var elapsed = watch.Elapsed;
+			_logger.LogInformation("{timeTaken}", elapsed);
+			response.SetTimeTaken(elapsed);
 			return response;
+		}
+	}
+
+	public static class FluentResponseExtensions
+	{
+		private const string TimeTakenKey = "TIME_TAKEN";
+
+		public static void SetTimeTaken(this IFluentHttpResponse response, TimeSpan value)
+		{
+			response.Items.Add(TimeTakenKey, value);
+		}
+
+		public static TimeSpan GetTimeTaken(this IFluentHttpResponse response)
+		{
+			return (TimeSpan)response.Items[TimeTakenKey];
 		}
 	}
 }
