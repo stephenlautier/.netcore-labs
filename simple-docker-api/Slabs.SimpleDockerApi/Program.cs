@@ -15,6 +15,7 @@ namespace Slabs.SimpleDockerApi
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseContentRoot(Directory.GetCurrentDirectory())
+				.UseUrls("http://*:2001")
                 .UseStartup<Startup>()
                 .UseApplicationInsights()
                 .Build();
