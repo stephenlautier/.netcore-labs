@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
-using System.Reflection.Metadata.Ecma335;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
@@ -15,31 +15,28 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 	public class FluentHttpClientFactory
 	{
 		private readonly IServiceProvider _serviceProvider;
-		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly Dictionary<string, FluentHttpClient> _clientsMap = new Dictionary<string, FluentHttpClient>();
 
-		public FluentHttpClientFactory(IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
+		public FluentHttpClientFactory(IServiceProvider serviceProvider)
 		{
 			_serviceProvider = serviceProvider;
-			_middlewareRunner = middlewareRunner;
 		}
 
-		public HttpClientBuilder CreateBuilder(string identifier)
+		public FluentHttpClientBuilder CreateBuilder(string identifier)
 		{
-			var builder = new HttpClientBuilder(this);
+			var builder = new FluentHttpClientBuilder(this);
 			builder.SetIdentifier(identifier);
 			return builder;
 		}
 
-		public FluentHttpClientFactory Add(HttpClientBuilder clientBuilder)
+		public FluentHttpClientFactory Add(FluentHttpClientBuilder clientBuilder)
 		{
 			if (clientBuilder == null) throw new ArgumentNullException(nameof(clientBuilder));
 			if (Has(clientBuilder.Identifier))
 				throw new KeyNotFoundException($"FluentHttpClient '{clientBuilder.Identifier}' is already registered.");
 
 			var clientOptions = clientBuilder.Build();
-			// todo: use activator
-			var client = new FluentHttpClient(clientOptions, _serviceProvider, _middlewareRunner);
+			var client = ActivatorUtilities.CreateInstance<FluentHttpClient>(_serviceProvider, clientOptions);
 
 			_clientsMap.Add(clientBuilder.Identifier, client);
 			return this;
@@ -62,7 +59,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		public bool Has(string identifier) => _clientsMap.ContainsKey(identifier);
 	}
 
-	public class HttpClientBuilder
+	public class FluentHttpClientBuilder
 	{
 		private readonly FluentHttpClientFactory _fluentHttpClientFactory;
 		private string _baseUrl;
@@ -71,41 +68,41 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		private readonly Dictionary<string, string> _headers = new Dictionary<string, string>();
 		private readonly List<Type> _middleware = new List<Type>();
 
-		public HttpClientBuilder(FluentHttpClientFactory fluentHttpClientFactory)
+		public FluentHttpClientBuilder(FluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_fluentHttpClientFactory = fluentHttpClientFactory;
 		}
 
-		public HttpClientBuilder SetBaseUrl(string url)
+		public FluentHttpClientBuilder SetBaseUrl(string url)
 		{
 			_baseUrl = url;
 			return this;
 		}
 
-		public HttpClientBuilder SetTimeout(int timeout)
+		public FluentHttpClientBuilder SetTimeout(int timeout)
 		{
 			_timeout = TimeSpan.FromSeconds(timeout);
 			return this;
 		}
-		public HttpClientBuilder SetTimeout(TimeSpan timeout)
+		public FluentHttpClientBuilder SetTimeout(TimeSpan timeout)
 		{
 			_timeout = timeout;
 			return this;
 		}
 
-		public HttpClientBuilder AddHeader(string key, string value)
+		public FluentHttpClientBuilder AddHeader(string key, string value)
 		{
 			_headers.Add(key, value);
 			return this;
 		}
 
-		public HttpClientBuilder SetIdentifier(string identifier)
+		public FluentHttpClientBuilder SetIdentifier(string identifier)
 		{
 			Identifier = identifier;
 			return this;
 		}
 
-		public HttpClientBuilder AddMiddleware<T>()
+		public FluentHttpClientBuilder AddMiddleware<T>()
 		{
 			_middleware.Add(typeof(T));
 			return this;
@@ -128,7 +125,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		/// <summary>
 		/// Register to <see cref="FluentHttpClientFactory"/>, same as <see cref="FluentHttpClientFactory.Add"/>
 		/// </summary>
-		public HttpClientBuilder Register()
+		public FluentHttpClientBuilder Register()
 		{
 			_fluentHttpClientFactory.Add(this);
 			return this;

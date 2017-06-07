@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -9,20 +10,22 @@ using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class FluentHttpClient
 	{
+		private string DebuggerDisplay => $"[{Identifier}] BaseUrl: '{BaseUrl}', MiddlewareCount: {_middleware.Count}";
 		private readonly HttpClient _httpClient;
 		public string Identifier { get; }
 		public string BaseUrl { get; }
 
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
-		private readonly IList<Type> _middlewares;
+		private readonly IList<Type> _middleware;
 
 		public FluentHttpClient(FluentHttpClientOptions options, IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
 			_middlewareRunner = middlewareRunner;
 			_httpClient = Configure(options);
-			_middlewares = options.Middleware;
+			_middleware = options.Middleware;
 			Identifier = options.Identifier;
 			BaseUrl = options.BaseUrl;
 		}
@@ -65,7 +68,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 				Method = "GET"
 			};
 
-			var response = await _middlewareRunner.Run<T>(_middlewares, request, async r => await GetAsHttp<T>(r.Url));
+			var response = await _middlewareRunner.Run<T>(_middleware, request, async r => await GetAsHttp<T>(r.Url));
 			return (FluentHttpResponse<T>)response;
 		}
 
