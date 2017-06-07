@@ -42,19 +42,22 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 
 		private void SetupHttp()
 		{
-			var httpClientBuilder = _httpClientFactory.CreateBuilder("auth");
-			httpClientBuilder.SetBaseUrl("http://staging.api.cpm-odin.com:1001")
+			_httpClientFactory.CreateBuilder("auth")
+				// shared
 				.AddHeader("user-agent", "slabs-testify")
 				.AddHeader("Accept-Language", "en-GB")
 				.SetTimeout(5)
+				.AddMiddleware<TimerHttpMiddleware>()
+				.AddMiddleware<LoggerHttpMiddleware>()
+
+				// auth
+				.SetBaseUrl("http://staging.api.cpm-odin.com:1001")
 				.Register()
 
 				// common
 				.SetIdentifier("common")
 				.SetBaseUrl("http://staging.api.cpm-odin.com:1002")
-				.Register()
-				;
-
+				.Register();
 		}
 	}
 }

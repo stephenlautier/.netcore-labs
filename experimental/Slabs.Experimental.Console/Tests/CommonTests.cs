@@ -24,6 +24,12 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		{
 			var result = await _fluentHttpClient.Get<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
 
+			var resultHttp = await _fluentHttpClient.GetAsHttp<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
+			resultHttp.EnsureSuccessStatusCode();
+
+			var resultHttpMw = await _fluentHttpClient.GetAsHttpWithMiddleware<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
+			resultHttpMw.EnsureSuccessStatusCode();
+
 			Check.That(result).IsNotNull();
 			Check.That(result.Id).IsStrictlyGreaterThan(0);
 			

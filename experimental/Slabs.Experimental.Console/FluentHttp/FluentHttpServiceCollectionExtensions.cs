@@ -17,6 +17,7 @@ namespace Microsoft.Extensions.DependencyInjection
 					throw new ArgumentNullException(nameof(services));
 
 				services.AddSingleton<HttpClientFactory>();
+				services.AddSingleton<IFluentHttpMiddlewareRunner, FluentHttpMiddlewareRunner>();
 
 				return services;
 			}

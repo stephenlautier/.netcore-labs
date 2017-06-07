@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
@@ -15,11 +17,13 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 	public class HttpClientFactory
 	{
 		private readonly IServiceProvider _serviceProvider;
+		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly Dictionary<string, FluentHttpClient> _clientsMap = new Dictionary<string, FluentHttpClient>();
 
-		public HttpClientFactory(IServiceProvider serviceProvider)
+		public HttpClientFactory(IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
 			_serviceProvider = serviceProvider;
+			_middlewareRunner = middlewareRunner;
 		}
 
 		public HttpClientBuilder CreateBuilder(string identifier)
@@ -36,7 +40,9 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 				throw new KeyNotFoundException($"FluentHttpClient '{clientBuilder.Identifier}' is already registered.");
 
 			var clientOptions = clientBuilder.Build();
-			var client = new FluentHttpClient(clientOptions);
+			// todo: use activator
+			var client = new FluentHttpClient(clientOptions, _serviceProvider, _middlewareRunner);
+
 			_clientsMap.Add(clientBuilder.Identifier, client);
 		}
 
@@ -57,6 +63,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		private TimeSpan _timeout;
 		public string Identifier { get; private set; }
 		private readonly Dictionary<string, string> _headers = new Dictionary<string, string>();
+		private readonly List<Type> _middleware = new List<Type>();
 
 		public HttpClientBuilder(HttpClientFactory httpClientFactory)
 		{
@@ -92,6 +99,12 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			return this;
 		}
 
+		public HttpClientBuilder AddMiddleware<T>()
+		{
+			_middleware.Add(typeof(T));
+			return this;
+		}
+
 		public FluentHttpClientOptions Build()
 		{
 			var options = new FluentHttpClientOptions
@@ -99,7 +112,8 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 				Timeout = _timeout,
 				BaseUrl = _baseUrl,
 				Identifier = Identifier,
-				Headers = _headers
+				Headers = _headers,
+				Middleware = _middleware
 			};
 
 			return options;
