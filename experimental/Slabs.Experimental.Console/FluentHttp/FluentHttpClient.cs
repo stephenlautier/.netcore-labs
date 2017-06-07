@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -31,9 +32,28 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			BaseUrl = options.BaseUrl;
 		}
 
-		public async Task<T> Post<T>(string url, object data)
+		public async Task<T> Post<T>(string url, object data, MediaTypeHeaderValue contentType = null)
 		{
-			var response = await _httpClient.PostAsync(url, new JsonContent(data));
+			var formatter = GetFormatter(contentType);
+
+			var response = await _httpClient.PostAsync(url, new ObjectContent(data.GetType(), data, formatter));
+
+			// todo: implement this better
+			response.EnsureSuccessStatusCode();
+
+			var dataResult = await ParseResult<T>(response);
+			return dataResult;
+		}
+
+		public async Task<T> Patch<T>(string url, object data, MediaTypeHeaderValue contentType = null)
+		{
+			var formatter = GetFormatter(contentType);
+
+			var request = new HttpRequestMessage(new HttpMethod("Patch"), url)
+			{
+				Content = new ObjectContent(data.GetType(), data, formatter)
+			};
+			var response = await _httpClient.SendAsync(request);
 
 			// todo: implement this better
 			response.EnsureSuccessStatusCode();
@@ -60,6 +80,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			var response = await _middlewareRunner.Run<T>(_middleware, request, async r => await _GetAsResponse<T>(r.Url));
 			return (FluentHttpResponse<T>)response;
 		}
+
 
 		private async Task<T> ParseResult<T>(HttpResponseMessage response) => await response.Content.ReadAsAsync<T>(Formatters);
 
@@ -89,6 +110,23 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 			return result;
 		}
+
+		/// <summary>Get the formatter for an HTTP content type.</summary>
+		/// <param name="contentType">The HTTP content type (or <c>null</c> to automatically select one).</param>
+		/// <exception cref="InvalidOperationException">No MediaTypeFormatters are available on the API client for this content type.</exception>
+		private MediaTypeFormatter GetFormatter(MediaTypeHeaderValue contentType = null)
+		{
+			if (!Formatters.Any())
+				throw new InvalidOperationException("No media type formatters available.");
+
+			MediaTypeFormatter formatter = contentType != null
+				? Formatters.FirstOrDefault(x => x.SupportedMediaTypes.Any(m => m.MediaType == contentType.MediaType))
+				: Formatters.FirstOrDefault();
+			if (formatter == null)
+				throw new InvalidOperationException($"No media type formatters are available for '{contentType}' content-type.");
+
+			return formatter;
+		}
 	}
 
 	public class FluentHttpClientOptions
@@ -98,13 +136,5 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		public string Identifier { get; set; }
 		public Dictionary<string, string> Headers { get; set; }
 		public List<Type> Middleware { get; set; }
-	}
-
-	public class JsonContent : StringContent
-	{
-		public JsonContent(object obj) :
-			base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
-		{
-		}
 	}
 }

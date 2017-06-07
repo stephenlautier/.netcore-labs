@@ -24,7 +24,6 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		private readonly ISessionState _sessionState;
 
 		private readonly FluentHttpClient _fluentHttpClient;
-		//private string _authBaseUri = "http://staging.api.cpm-odin.com:1001";
 
 		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState, FluentHttpClientFactory fluentHttpClientFactory)
 		{
@@ -35,26 +34,11 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 
 		public async Task Execute()
 		{
-			//var httpClient = new HttpClient
-			//{
-			//	BaseAddress = new Uri(_authBaseUri)
-			//};
-			//httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			//httpClient.Timeout = TimeSpan.FromSeconds(5);
 			var result = await _fluentHttpClient.Post<LoginResponse>("/api/auth/login", new
 			{
 				username = "test",
 				password = "test"
 			});
-
-			//var response = await httpClient.PostAsync("/api/auth/login", new JsonContent(new
-			//{
-			//	username = "test",
-			//	password = "test",
-			//}));
-			//response.EnsureSuccessStatusCode();
-			//var responseContent = await response.Content.ReadAsStringAsync();
-			//var result = JsonConvert.DeserializeObject<LoginResponse>(responseContent);
 
 			Check.That(result).IsNotNull();
 			Check.That(result.AccessToken).IsNotNull();
@@ -69,28 +53,19 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 	{
 		private readonly ILogger _logger;
 		private readonly ISessionState _sessionState;
-		private string _authBaseUri = "http://staging.api.cpm-odin.com:1001";
+		private readonly FluentHttpClient _fluentHttpClient;
 
-		public Auth_KeepAliveTest(ILogger<Auth_KeepAliveTest> logger, ISessionState sessionState)
+		public Auth_KeepAliveTest(ILogger<Auth_KeepAliveTest> logger, ISessionState sessionState, FluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_sessionState = sessionState;
+			_fluentHttpClient = fluentHttpClientFactory.Get("auth");
 		}
 
 		public async Task Execute()
 		{
-			var httpClient = new HttpClient
-			{
-				BaseAddress = new Uri(_authBaseUri)
-			};
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			httpClient.Timeout = TimeSpan.FromSeconds(5);
-
 			var token = _sessionState.Get<string>("auth:token");
-			var response = await httpClient.PostAsync("/api/auth/keep-alive", new JsonContent(token));
-			response.EnsureSuccessStatusCode();
-			var responseContent = await response.Content.ReadAsStringAsync();
-			var result = JsonConvert.DeserializeObject<KeepAliveResponse>(responseContent);
+			var result = await _fluentHttpClient.Patch<KeepAliveResponse>("/api/auth/keep-alive", token);
 
 			Check.That(result).IsNotNull();
 			Check.That(result.AccessToken).IsNotNull();

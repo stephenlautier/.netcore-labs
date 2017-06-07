@@ -51,7 +51,8 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 				.AddMiddleware<LoggerHttpMiddleware>()
 
 				// auth
-				.SetBaseUrl("http://staging.api.cpm-odin.com:1001")
+				//.SetBaseUrl("http://staging.api.cpm-odin.com:1001")
+				.SetBaseUrl("http://localhost:2001")
 				.Register()
 
 				// common
