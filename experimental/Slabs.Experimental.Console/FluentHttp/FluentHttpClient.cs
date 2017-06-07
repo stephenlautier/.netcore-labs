@@ -2,8 +2,9 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Net.Http;
-using System.Net.Http.Headers;
+using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,6 +17,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		private readonly HttpClient _httpClient;
 		public string Identifier { get; }
 		public string BaseUrl { get; }
+		public MediaTypeFormatterCollection Formatters { get; } = new MediaTypeFormatterCollection();
 
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly IList<Type> _middleware;
@@ -42,12 +44,41 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 		public async Task<T> Get<T>(string url)
 		{
-			var response = await GetAsHttp<T>(url);
+			var response = await _GetAsResponse<T>(url);
 			response.EnsureSuccessStatusCode();
 			return response.Data;
 		}
 
-		public async Task<FluentHttpResponse<T>> GetAsHttp<T>(string url)
+		public async Task<FluentHttpResponse<T>> GetAs<T>(string url)
+		{
+			var request = new FluentHttpRequest
+			{
+				Url = url,
+				Method = HttpMethod.Get
+			};
+
+			var response = await _middlewareRunner.Run<T>(_middleware, request, async r => await _GetAsResponse<T>(r.Url));
+			return (FluentHttpResponse<T>)response;
+		}
+
+		private async Task<T> ParseResult<T>(HttpResponseMessage response) => await response.Content.ReadAsAsync<T>(Formatters);
+
+		private HttpClient Configure(FluentHttpClientOptions options)
+		{
+			var httpClient = new HttpClient
+			{
+				BaseAddress = new Uri(options.BaseUrl)
+			};
+			httpClient.DefaultRequestHeaders.Add("Accept", Formatters.SelectMany(x => x.SupportedMediaTypes).Select(x => x.MediaType));
+			httpClient.Timeout = options.Timeout;
+
+			foreach (var headerEntry in options.Headers)
+				httpClient.DefaultRequestHeaders.Add(headerEntry.Key, headerEntry.Value);
+
+			return httpClient;
+		}
+
+		private async Task<FluentHttpResponse<T>> _GetAsResponse<T>(string url)
 		{
 			var response = await _httpClient.GetAsync(url);
 
@@ -58,44 +89,8 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 			return result;
 		}
-
-		public async Task<FluentHttpResponse<T>> GetAsHttpWithMiddleware<T>(string url)
-		{
-			var request = new FluentHttpRequest
-			{
-				Url = url,
-				Method = "GET"
-			};
-
-			var response = await _middlewareRunner.Run<T>(_middleware, request, async r => await GetAsHttp<T>(r.Url));
-			return (FluentHttpResponse<T>)response;
-		}
-
-		private async Task<T> ParseResult<T>(HttpResponseMessage response)
-		{
-			var responseContent = await response.Content.ReadAsStringAsync();
-			// todo: settings options
-			return JsonConvert.DeserializeObject<T>(responseContent);
-		}
-
-		private HttpClient Configure(FluentHttpClientOptions options)
-		{
-			var httpClient = new HttpClient
-			{
-				BaseAddress = new Uri(options.BaseUrl)
-			};
-			httpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-			httpClient.Timeout = options.Timeout;
-
-			foreach (var headerEntry in options.Headers)
-			{
-				httpClient.DefaultRequestHeaders.Add(headerEntry.Key, headerEntry.Value);
-			}
-
-			return httpClient;
-		}
 	}
-	
+
 	public class FluentHttpClientOptions
 	{
 		public string BaseUrl { get; set; }

@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
 	public delegate Task<IFluentHttpResponse> FluentHttpRequestDelegate(FluentHttpRequest request);
-
+	
 	public class FluentHttpRequest
 	{
-		public string Method { get; set; }
+		public HttpMethod Method { get; set; }
 		public string Url { get; set; }
 		public object Data { get; set; }
 	}

@@ -21,6 +21,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="1.4.0" />
     <PackageReference Include="Serilog.Sinks.ColoredConsole" Version="2.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.3.0" />
+    <PackageReference Include="WinInsider.System.Net.Http.Formatting" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>
