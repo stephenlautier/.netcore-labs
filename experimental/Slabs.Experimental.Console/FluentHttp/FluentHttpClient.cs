@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
@@ -19,9 +17,10 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		public string Identifier { get; }
 		public string BaseUrl { get; }
 		public MediaTypeFormatterCollection Formatters { get; } = new MediaTypeFormatterCollection();
-
+		
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly IList<Type> _middleware;
+		private static readonly HttpMethod HttpMethodPatch = new HttpMethod("Patch");
 
 		public FluentHttpClient(FluentHttpClientOptions options, IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
@@ -49,7 +48,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		{
 			var formatter = GetFormatter(contentType);
 
-			var request = new HttpRequestMessage(new HttpMethod("Patch"), url)
+			var request = new HttpRequestMessage(HttpMethodPatch, url)
 			{
 				Content = new ObjectContent(data.GetType(), data, formatter)
 			};
@@ -137,4 +136,5 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		public Dictionary<string, string> Headers { get; set; }
 		public List<Type> Middleware { get; set; }
 	}
+
 }
