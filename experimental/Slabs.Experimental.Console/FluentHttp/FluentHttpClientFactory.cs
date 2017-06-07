@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
 
 namespace Slabs.Experimental.ConsoleClient.FluentHttp
 {
 	/*
 	 * todo:
-	 *  - HttpClientFactory
+	 *  - FluentHttpClientFactory
 	 *		- Default configs
 	 *		- Default configs configurable
 	 *  - 
-	 * 
 	 */
 
-	public class HttpClientFactory
+	public class FluentHttpClientFactory
 	{
 		private readonly IServiceProvider _serviceProvider;
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly Dictionary<string, FluentHttpClient> _clientsMap = new Dictionary<string, FluentHttpClient>();
 
-		public HttpClientFactory(IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
+		public FluentHttpClientFactory(IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
 			_serviceProvider = serviceProvider;
 			_middlewareRunner = middlewareRunner;
@@ -31,7 +31,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			return builder;
 		}
 
-		public void Add(HttpClientBuilder clientBuilder)
+		public FluentHttpClientFactory Add(HttpClientBuilder clientBuilder)
 		{
 			if (clientBuilder == null) throw new ArgumentNullException(nameof(clientBuilder));
 			if (Has(clientBuilder.Identifier))
@@ -42,11 +42,14 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			var client = new FluentHttpClient(clientOptions, _serviceProvider, _middlewareRunner);
 
 			_clientsMap.Add(clientBuilder.Identifier, client);
+			return this;
 		}
 
-		public void Remove(string identity)
+		public FluentHttpClientFactory Remove(string identity)
 		{
 			_clientsMap.Remove(identity);
+			// todo: dispose?
+			return this;
 		}
 
 		public FluentHttpClient Get(string identifier)
@@ -61,16 +64,16 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 	public class HttpClientBuilder
 	{
-		private readonly HttpClientFactory _httpClientFactory;
+		private readonly FluentHttpClientFactory _fluentHttpClientFactory;
 		private string _baseUrl;
 		private TimeSpan _timeout;
 		public string Identifier { get; private set; }
 		private readonly Dictionary<string, string> _headers = new Dictionary<string, string>();
 		private readonly List<Type> _middleware = new List<Type>();
 
-		public HttpClientBuilder(HttpClientFactory httpClientFactory)
+		public HttpClientBuilder(FluentHttpClientFactory fluentHttpClientFactory)
 		{
-			_httpClientFactory = httpClientFactory;
+			_fluentHttpClientFactory = fluentHttpClientFactory;
 		}
 
 		public HttpClientBuilder SetBaseUrl(string url)
@@ -123,11 +126,11 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		}
 
 		/// <summary>
-		/// Register to <see cref="HttpClientFactory"/>, same as <see cref="HttpClientFactory.Add"/>
+		/// Register to <see cref="FluentHttpClientFactory"/>, same as <see cref="FluentHttpClientFactory.Add"/>
 		/// </summary>
 		public HttpClientBuilder Register()
 		{
-			_httpClientFactory.Add(this);
+			_fluentHttpClientFactory.Add(this);
 			return this;
 		}
 	}

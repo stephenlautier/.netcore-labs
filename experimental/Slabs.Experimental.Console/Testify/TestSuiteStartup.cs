@@ -9,13 +9,13 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 	{
 		private readonly ILogger<TestSuiteStartup> _logger;
 		private readonly TestSuiteBuilderFactory _testSuiteBuilderFactory;
-		private readonly HttpClientFactory _httpClientFactory;
+		private readonly FluentHttpClientFactory _fluentHttpClientFactory;
 
-		public TestSuiteStartup(ILogger<TestSuiteStartup> logger, TestSuiteBuilderFactory testSuiteBuilderFactory, HttpClientFactory httpClientFactory)
+		public TestSuiteStartup(ILogger<TestSuiteStartup> logger, TestSuiteBuilderFactory testSuiteBuilderFactory, FluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_testSuiteBuilderFactory = testSuiteBuilderFactory;
-			_httpClientFactory = httpClientFactory;
+			_fluentHttpClientFactory = fluentHttpClientFactory;
 		}
 
 		public async Task Run()
@@ -42,7 +42,7 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 
 		private void SetupHttp()
 		{
-			_httpClientFactory.CreateBuilder("auth")
+			_fluentHttpClientFactory.CreateBuilder("auth")
 				// shared
 				.AddHeader("user-agent", "slabs-testify")
 				.AddHeader("Accept-Language", "en-GB")

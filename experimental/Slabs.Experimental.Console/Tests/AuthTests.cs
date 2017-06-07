@@ -26,11 +26,11 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		private readonly FluentHttpClient _fluentHttpClient;
 		//private string _authBaseUri = "http://staging.api.cpm-odin.com:1001";
 
-		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState, HttpClientFactory httpClientFactory)
+		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState, FluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_sessionState = sessionState;
-			_fluentHttpClient = httpClientFactory.Get("auth");
+			_fluentHttpClient = fluentHttpClientFactory.Get("auth");
 		}
 
 		public async Task Execute()

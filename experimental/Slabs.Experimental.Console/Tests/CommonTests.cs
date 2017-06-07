@@ -14,10 +14,10 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 
 		private readonly FluentHttpClient _fluentHttpClient;
 
-		public Common_TermsAndConditionsTest(ILogger<Common_TermsAndConditionsTest> logger, HttpClientFactory httpClientFactory)
+		public Common_TermsAndConditionsTest(ILogger<Common_TermsAndConditionsTest> logger, FluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
-			_fluentHttpClient = httpClientFactory.Get("common");
+			_fluentHttpClient = fluentHttpClientFactory.Get("common");
 		}
 
 		public async Task Execute()
