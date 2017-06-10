@@ -1,22 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NFluent;
-using Slabs.Experimental.ConsoleClient.Testify;
-using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
 using Slabs.Experimental.ConsoleClient.FluentHttp;
+using Slabs.Experimental.ConsoleClient.Testify;
+using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.Tests
 {
-	public class JsonContent : StringContent
-	{
-		public JsonContent(object obj) :
-			base(JsonConvert.SerializeObject(obj), Encoding.UTF8, "application/json")
-		{ }
-	}
 
 	public class Auth_LoginTest : ITest
 	{

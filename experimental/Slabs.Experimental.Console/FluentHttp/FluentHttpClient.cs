@@ -13,19 +13,30 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 	public class FluentHttpClient
 	{
 		private string DebuggerDisplay => $"[{Identifier}] BaseUrl: '{BaseUrl}', MiddlewareCount: {_middleware.Count}";
-		private readonly HttpClient _httpClient;
+
+		/// <summary>
+		/// Get the identifier (key) for this instance, which is registered within the factory as.
+		/// </summary>
 		public string Identifier { get; }
 		public string BaseUrl { get; }
+
+		/// <summary>
+		/// Raw http client. This should be avoided from being used.
+		/// However if something is not exposed and its really needed, it can be used from here.
+		/// </summary>
+		public HttpClient RawHttpClient { get; }
 		public MediaTypeFormatterCollection Formatters { get; } = new MediaTypeFormatterCollection();
-		
+		public HttpRequestHeaders Headers { get; }
+
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly IList<Type> _middleware;
 		private static readonly HttpMethod HttpMethodPatch = new HttpMethod("Patch");
-
+		
 		public FluentHttpClient(FluentHttpClientOptions options, IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
 			_middlewareRunner = middlewareRunner;
-			_httpClient = Configure(options);
+			RawHttpClient = Configure(options);
+			Headers = RawHttpClient.DefaultRequestHeaders;
 			_middleware = options.Middleware;
 			Identifier = options.Identifier;
 			BaseUrl = options.BaseUrl;
@@ -35,7 +46,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		{
 			var formatter = GetFormatter(contentType);
 
-			var response = await _httpClient.PostAsync(url, new ObjectContent(data.GetType(), data, formatter));
+			var response = await RawHttpClient.PostAsync(url, new ObjectContent(data.GetType(), data, formatter));
 
 			// todo: implement this better
 			response.EnsureSuccessStatusCode();
@@ -52,7 +63,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			{
 				Content = new ObjectContent(data.GetType(), data, formatter)
 			};
-			var response = await _httpClient.SendAsync(request);
+			var response = await RawHttpClient.SendAsync(request);
 
 			// todo: implement this better
 			response.EnsureSuccessStatusCode();
@@ -79,8 +90,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			var response = await _middlewareRunner.Run<T>(_middleware, request, async r => await _GetAsResponse<T>(r.Url));
 			return (FluentHttpResponse<T>)response;
 		}
-
-
+		
 		private async Task<T> ParseResult<T>(HttpResponseMessage response) => await response.Content.ReadAsAsync<T>(Formatters);
 
 		private HttpClient Configure(FluentHttpClientOptions options)
@@ -100,7 +110,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 		private async Task<FluentHttpResponse<T>> _GetAsResponse<T>(string url)
 		{
-			var response = await _httpClient.GetAsync(url);
+			var response = await RawHttpClient.GetAsync(url);
 
 			var result = new FluentHttpResponse<T>(response);
 
