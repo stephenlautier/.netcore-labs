@@ -23,11 +23,22 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 
 		public async Task Execute()
 		{
+			// non fluent
 			var result = await _fluentHttpClient.Post<LoginResponse>("/api/auth/login", new
 			{
 				username = "test",
 				password = "test"
 			});
+
+			// fluent
+			var fluentResult = await _fluentHttpClient.CreateRequest("/api/auth/login")
+				.AsPost()
+				.WithBody(new
+				{
+					username = "test",
+					password = "test"
+				})
+				.Return<LoginResponse>();
 
 			Check.That(result).IsNotNull();
 			Check.That(result.AccessToken).IsNotNull();

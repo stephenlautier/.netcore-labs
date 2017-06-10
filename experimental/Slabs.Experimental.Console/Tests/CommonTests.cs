@@ -23,19 +23,19 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		public async Task Execute()
 		{
 			var result = await _fluentHttpClient.Get<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
-			
+
 			var response = await _fluentHttpClient.GetAs<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
 			response.EnsureSuccessStatusCode();
-			
+
 			var timeTaken = response.GetTimeTaken();
 			Check.That(timeTaken).IsLessThan(TimeSpan.FromMilliseconds(250));
 			Check.That(result).IsNotNull();
 			Check.That(result.Id).IsStrictlyGreaterThan(0);
-			
+
 			_logger.LogInformation("[{service}] complete", nameof(Common_TermsAndConditionsTest));
 		}
 	}
-	
+
 
 	public class TermsAndConditionsResponse
 	{
@@ -43,7 +43,7 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		public DateTime PublicationDate { get; set; }
 		public string Content { get; set; }
 	}
-	
+
 
 	public static class CommonTests
 	{
