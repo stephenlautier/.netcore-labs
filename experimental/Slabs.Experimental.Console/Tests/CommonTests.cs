@@ -24,7 +24,9 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		{
 			var result = await _fluentHttpClient.Get<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
 
-			var response = await _fluentHttpClient.GetAs<TermsAndConditionsResponse>("/api/profile/terms-and-conditions/latest");
+			var response = await _fluentHttpClient.CreateRequest("/api/profile/terms-and-conditions/latest")
+				.AsGet()
+				.ReturnAsResponse<TermsAndConditionsResponse>();
 			response.EnsureSuccessStatusCode();
 
 			var timeTaken = response.GetTimeTaken();

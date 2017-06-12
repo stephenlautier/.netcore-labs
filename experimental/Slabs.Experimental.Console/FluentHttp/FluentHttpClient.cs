@@ -235,14 +235,12 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		{
 			var response = await ReturnAsResponse<T>();
 			return response.Data;
-			// todo: response should be handled here
-			//var dataResult = await response.Content.ReadAsAsync<T>(_fluentHttpClient.Formatters);
-			//return dataResult;
 		}
 
 		public async Task<FluentHttpResponse<T>> ReturnAsResponse<T>()
 		{
 			var response = await _fluentHttpClient.Send<T>(this);
+			response.Data = await response.RawResponse.Content.ReadAsAsync<T>(_fluentHttpClient.Formatters);
 			return response;
 		}
 
