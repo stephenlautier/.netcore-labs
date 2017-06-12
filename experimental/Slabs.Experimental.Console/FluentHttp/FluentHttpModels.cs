@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -10,8 +11,16 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 	
 	public class FluentHttpRequest
 	{
-		public HttpMethod Method { get; set; }
-		public string Url { get; set; }
+		public HttpRequestMessage RawRequest { get; }
+
+		public FluentHttpRequest(HttpRequestMessage rawRequest)
+		{
+			RawRequest = rawRequest;
+		}
+
+		public HttpMethod Method => RawRequest.Method;
+		public Uri Url => RawRequest.RequestUri;
+		// todo: remove?
 		public object Data { get; set; }
 	}
 
@@ -27,20 +36,20 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 	public class FluentHttpResponse<T> : IFluentHttpResponse
 	{
-		private readonly HttpResponseMessage _response;
+		public HttpResponseMessage RawResponse { get; }
 
-		public FluentHttpResponse(HttpResponseMessage response)
+		public FluentHttpResponse(HttpResponseMessage rawResponse)
 		{
-			_response = response;
+			RawResponse = rawResponse;
 		}
 
 		public T Data { get; set; }
 
-		public HttpStatusCode StatusCode => _response.StatusCode;
-		public bool IsSuccessStatusCode => _response.IsSuccessStatusCode;
-		public void EnsureSuccessStatusCode() => _response.EnsureSuccessStatusCode();
-		public string ReasonPhrase => _response.ReasonPhrase;
-		public HttpResponseHeaders Headers => _response.Headers;
+		public HttpStatusCode StatusCode => RawResponse.StatusCode;
+		public bool IsSuccessStatusCode => RawResponse.IsSuccessStatusCode;
+		public void EnsureSuccessStatusCode() => RawResponse.EnsureSuccessStatusCode();
+		public string ReasonPhrase => RawResponse.ReasonPhrase;
+		public HttpResponseHeaders Headers => RawResponse.Headers;
 		/// <summary>
 		/// Gets or sets a key/value collection that can be used to share data within the scope of this request/response.
 		/// </summary>

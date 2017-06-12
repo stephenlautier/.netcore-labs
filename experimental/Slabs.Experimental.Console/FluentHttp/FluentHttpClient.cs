@@ -32,7 +32,6 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		private readonly IServiceProvider _serviceProvider;
 		private readonly IFluentHttpMiddlewareRunner _middlewareRunner;
 		private readonly IList<Type> _middleware;
-		private static readonly HttpMethod HttpMethodPatch = new HttpMethod("Patch");
 
 		public FluentHttpClient(FluentHttpClientOptions options, IServiceProvider serviceProvider, IFluentHttpMiddlewareRunner middlewareRunner)
 		{
@@ -45,53 +44,27 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			BaseUrl = options.BaseUrl;
 		}
 
-		public async Task<T> Post<T>(string url, object data, MediaTypeHeaderValue contentType = null)
+		public Task<T> Post<T>(string url, object data, MediaTypeHeaderValue contentType = null)
 		{
-			var formatter = GetFormatter(contentType);
-
-			var response = await RawHttpClient.PostAsync(url, new ObjectContent(data.GetType(), data, formatter));
-
-			// todo: implement this better
-			response.EnsureSuccessStatusCode();
-
-			var dataResult = await ParseResult<T>(response);
-			return dataResult;
+			return CreateRequest(url)
+				.AsPost()
+				.WithBody(data, contentType)
+				.Return<T>();
 		}
 
-		public async Task<T> Patch<T>(string url, object data, MediaTypeHeaderValue contentType = null)
+		public Task<T> Patch<T>(string url, object data, MediaTypeHeaderValue contentType = null)
 		{
-			var formatter = GetFormatter(contentType);
-
-			var request = new HttpRequestMessage(HttpMethodPatch, url)
-			{
-				Content = new ObjectContent(data.GetType(), data, formatter)
-			};
-			var response = await RawHttpClient.SendAsync(request);
-
-			// todo: implement this better
-			response.EnsureSuccessStatusCode();
-
-			var dataResult = await ParseResult<T>(response);
-			return dataResult;
+			return CreateRequest(url)
+				.AsPatch()
+				.WithBody(data, contentType)
+				.Return<T>();
 		}
 
-		public async Task<T> Get<T>(string url)
+		public Task<T> Get<T>(string url)
 		{
-			var response = await _GetAsResponse<T>(url);
-			response.EnsureSuccessStatusCode();
-			return response.Data;
-		}
-
-		public async Task<FluentHttpResponse<T>> GetAs<T>(string url)
-		{
-			var request = new FluentHttpRequest
-			{
-				Url = url,
-				Method = HttpMethod.Get
-			};
-
-			var response = await _middlewareRunner.Run<T>(_middleware, request, async r => await _GetAsResponse<T>(r.Url));
-			return (FluentHttpResponse<T>)response;
+			return CreateRequest(url)
+				.AsGet()
+				.Return<T>();
 		}
 
 		/// <summary>Get the formatter for an HTTP content type.</summary>
@@ -119,8 +92,6 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			return builder;
 		}
 
-		private async Task<T> ParseResult<T>(HttpResponseMessage response) => await response.Content.ReadAsAsync<T>(Formatters);
-
 		private HttpClient Configure(FluentHttpClientOptions options)
 		{
 			var httpClient = new HttpClient
@@ -136,17 +107,24 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			return httpClient;
 		}
 
-		private async Task<FluentHttpResponse<T>> _GetAsResponse<T>(string url)
+		public async Task<FluentHttpResponse<T>> Send<T>(FluentHttpRequestBuilder builder)
 		{
-			var response = await RawHttpClient.GetAsync(url);
+			var fluentRequest = builder.Build();
 
-			var result = new FluentHttpResponse<T>(response);
+			var response = await _middlewareRunner.Run<T>(_middleware, fluentRequest, async request =>
+			{
+				var result = await RawHttpClient.SendAsync(request.RawRequest);
+				return ToFluentResponse<T>(result);
+			});
 
-			if (response.IsSuccessStatusCode)
-				result.Data = await ParseResult<T>(response);
+			// todo: implement this better
+			response.EnsureSuccessStatusCode();
 
-			return result;
+			return (FluentHttpResponse<T>)response;
 		}
+
+		private static FluentHttpResponse<T> ToFluentResponse<T>(HttpResponseMessage response) => new FluentHttpResponse<T>(response);
+
 	}
 
 	public class FluentHttpClientOptions
@@ -216,6 +194,23 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			return WithBody(body, formatter, mediaType);
 		}
 
+		public FluentHttpRequestBuilder WithBody(object body, MediaTypeHeaderValue contentType = null)
+		{
+			MediaTypeFormatter formatter = _fluentHttpClient.GetFormatter(contentType);
+			string mediaType = contentType?.MediaType;
+			return WithBody(body, formatter, mediaType);
+		}
+
+		/// <summary>Set the body content of the HTTP request.</summary>
+		/// <param name="body">Value to serialize into the HTTP body content.</param>
+		/// <param name="formatter">Media type formatter with which to format the request body format.</param>
+		/// <param name="mediaType">HTTP media type (or <c>null</c> for the <paramref name="formatter"/>'s default).</param>
+		/// <returns>Returns the request builder for chaining.</returns>
+		public FluentHttpRequestBuilder WithBody(object body, MediaTypeFormatter formatter, string mediaType = null)
+		{
+			return WithBodyContent(new ObjectContent(body.GetType(), body, formatter));
+		}
+
 		/// <summary>Set the body content of the HTTP request.</summary>
 		/// <param name="body">Value to serialize into the HTTP body content.</param>
 		/// <param name="formatter">Media type formatter with which to format the request body format.</param>
@@ -236,9 +231,30 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		}
 		
 
-		public Task<T> Return<T>()
+		public async Task<T> Return<T>()
 		{
-			throw new NotImplementedException();
+			var response = await ReturnAsResponse<T>();
+			return response.Data;
+			// todo: response should be handled here
+			//var dataResult = await response.Content.ReadAsAsync<T>(_fluentHttpClient.Formatters);
+			//return dataResult;
+		}
+
+		public async Task<FluentHttpResponse<T>> ReturnAsResponse<T>()
+		{
+			var response = await _fluentHttpClient.Send<T>(this);
+			return response;
+		}
+
+		public FluentHttpRequest Build()
+		{
+			var httpRequest = new HttpRequestMessage(HttpMethod, Uri);
+
+			if (_httpBody != null)
+				httpRequest.Content = _httpBody;
+
+			var fluentRequest = new FluentHttpRequest(httpRequest);
+			return fluentRequest;
 		}
 	}
 
