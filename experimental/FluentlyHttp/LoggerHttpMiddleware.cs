@@ -8,7 +8,6 @@ namespace FluentlyHttp
 	public class LoggerHttpMiddleware : IFluentHttpMiddleware
 	{
 		private readonly FluentHttpRequestDelegate _next;
-
 		private readonly ILogger _logger;
 
 		public LoggerHttpMiddleware(FluentHttpRequestDelegate next, ILogger<LoggerHttpMiddleware> logger)
@@ -28,7 +27,6 @@ namespace FluentlyHttp
 	public class TimerHttpMiddleware : IFluentHttpMiddleware
 	{
 		private readonly FluentHttpRequestDelegate _next;
-
 		private readonly ILogger _logger;
 
 		public TimerHttpMiddleware(FluentHttpRequestDelegate next, ILogger<TimerHttpMiddleware> logger)

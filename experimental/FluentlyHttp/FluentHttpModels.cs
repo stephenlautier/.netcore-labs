@@ -51,7 +51,7 @@ namespace FluentlyHttp
 		public string ReasonPhrase => RawResponse.ReasonPhrase;
 		public HttpResponseHeaders Headers => RawResponse.Headers;
 		/// <summary>
-		/// Gets or sets a key/value collection that can be used to share data within the scope of this request/response.
+		/// Gets or sets a key/value collection that can be used to share data within the scope of request/response.
 		/// </summary>
 		public IDictionary<object, object> Items { get; set; } = new Dictionary<object, object>();
 	}
