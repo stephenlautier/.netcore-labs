@@ -89,9 +89,9 @@ namespace FluentlyHttp
 		public FluentHttpRequestBuilder CreateRequest(string uriTemplate = null, object interpolationData = null)
 		{
 			var builder = ActivatorUtilities.CreateInstance<FluentHttpRequestBuilder>(_serviceProvider, this);
-			if (uriTemplate != null)
-				builder.WithUri(uriTemplate, interpolationData);
-			return builder;
+			return uriTemplate != null 
+				? builder.WithUri(uriTemplate, interpolationData) 
+				: builder;
 		}
 
 		private HttpClient Configure(FluentHttpClientOptions options)
@@ -141,13 +141,21 @@ namespace FluentlyHttp
 	public class FluentHttpRequestBuilder
 	{
 		public HttpMethod HttpMethod { get; private set; }
+
+		/// <summary>
+		/// Gets the Uri used for the HTTP request.
+		/// </summary>
 		public string Uri { get; private set; }
+
+		/// <summary>
+		/// Gets the Uri template for the HTTP request (without interpolation).
+		/// </summary>
 		public string UriTemplate { get; private set; }
 
 		private readonly FluentHttpClient _fluentHttpClient;
+		private HttpContent _httpBody;
 		private static readonly HttpMethod HttpMethodPatch = new HttpMethod("Patch");
 		private static readonly Regex InterpolationRegex = new Regex(@"\{(\w+)\}", RegexOptions.Compiled);
-		private HttpContent _httpBody;
 
 		public FluentHttpRequestBuilder(FluentHttpClient fluentHttpClient)
 		{
@@ -228,7 +236,7 @@ namespace FluentlyHttp
 
 		/// <summary>Set the body content of the HTTP request.</summary>
 		/// <param name="body">Value to serialize into the HTTP body content.</param>
-		/// <param name="contentType">Request body format (or <c>null</c> to use the first supported Content-Type in the <see cref="Client.IRequest.Formatters"/>).</param>
+		/// <param name="contentType">Request body format (or <c>null</c> to use the first supported Content-Type in the <see cref="FluentHttpClient.Formatters"/>).</param>
 		/// <returns>Returns the request builder for chaining.</returns>
 		/// <exception cref="InvalidOperationException">No MediaTypeFormatters are available on the API client for this content type.</exception>
 		public FluentHttpRequestBuilder WithBody<T>(T body, MediaTypeHeaderValue contentType = null)
@@ -290,7 +298,6 @@ namespace FluentlyHttp
 		public FluentHttpRequest Build()
 		{
 			var httpRequest = new HttpRequestMessage(HttpMethod, Uri);
-
 			if (_httpBody != null)
 				httpRequest.Content = _httpBody;
 
