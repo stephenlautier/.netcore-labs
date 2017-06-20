@@ -1,4 +1,4 @@
-﻿using Slabs.Experimental.ConsoleClient.FluentHttp;
+﻿using FluentlyHttp;
 using System;
 
 
@@ -11,7 +11,7 @@ namespace Microsoft.Extensions.DependencyInjection
 	public static class FluentHttpServiceCollectionExtensions
 		{
 
-			public static IServiceCollection AddFluentHttp(this IServiceCollection services)
+			public static IServiceCollection AddFluentlyHttp(this IServiceCollection services)
 			{
 				if (services == null)
 					throw new ArgumentNullException(nameof(services));

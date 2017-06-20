@@ -28,4 +28,8 @@
     <Folder Include="suite-configs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FluentlyHttp\FluentlyHttp.csproj" />
+  </ItemGroup>
+
 </Project>

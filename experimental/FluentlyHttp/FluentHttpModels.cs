@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
-namespace Slabs.Experimental.ConsoleClient.FluentHttp
+namespace FluentlyHttp
 {
 	public delegate Task<IFluentHttpResponse> FluentHttpRequestDelegate(FluentHttpRequest request);
 	

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Slabs.Experimental.ConsoleClient.FluentHttp
+namespace FluentlyHttp
 {
 	/*
 	 * todo:
@@ -123,7 +123,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 		}
 
 		/// <summary>
-		/// Register to <see cref="FluentHttpClientFactory"/>, same as <see cref="FluentHttpClientFactory.Add"/>
+		/// Register to <see cref="FluentHttpClientFactory"/>, same as <see cref="Add(FluentHttpClientBuilder)"/>
 		/// </summary>
 		public FluentHttpClientBuilder Register()
 		{

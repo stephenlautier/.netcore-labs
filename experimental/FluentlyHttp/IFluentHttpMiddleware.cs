@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Slabs.Experimental.ConsoleClient.FluentHttp
+namespace FluentlyHttp
 {
 	public interface IFluentHttpMiddleware
 	{

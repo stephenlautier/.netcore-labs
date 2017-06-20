@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -6,9 +7,8 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Slabs.Experimental.ConsoleClient.FluentHttp
+namespace FluentlyHttp
 {
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class FluentHttpClient
@@ -69,7 +69,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 
 		/// <summary>Get the formatter for an HTTP content type.</summary>
 		/// <param name="contentType">The HTTP content type (or <c>null</c> to automatically select one).</param>
-		/// <exception cref="InvalidOperationException">No MediaTypeFormatters are available on the API client for this content type.</exception>
+		/// <exception cref="System.InvalidOperationException">No MediaTypeFormatters are available on the API client for this content type.</exception>
 		public MediaTypeFormatter GetFormatter(MediaTypeHeaderValue contentType = null)
 		{
 			if (!Formatters.Any())
@@ -102,7 +102,7 @@ namespace Slabs.Experimental.ConsoleClient.FluentHttp
 			httpClient.Timeout = options.Timeout;
 
 			foreach (var headerEntry in options.Headers)
-				httpClient.DefaultRequestHeaders.Add(headerEntry.Key, headerEntry.Value);
+				httpClient.DefaultRequestHeaders.Add((string) headerEntry.Key, (string) headerEntry.Value);
 
 			return httpClient;
 		}

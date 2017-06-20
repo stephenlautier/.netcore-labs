@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Diagnostics;
-using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 
-namespace Slabs.Experimental.ConsoleClient.FluentHttp
+namespace FluentlyHttp
 {
 	public class LoggerHttpMiddleware : IFluentHttpMiddleware
 	{

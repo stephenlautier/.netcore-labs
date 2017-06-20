@@ -1,7 +1,7 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using FluentlyHttp;
+using Microsoft.Extensions.Logging;
 using Slabs.Experimental.ConsoleClient.Tests;
 using System.Threading.Tasks;
-using Slabs.Experimental.ConsoleClient.FluentHttp;
 
 namespace Slabs.Experimental.ConsoleClient.Testify
 {
