@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using FluentlyHttp.Utils;
 
 namespace FluentlyHttp
 {
@@ -16,7 +18,7 @@ namespace FluentlyHttp
 		private string DebuggerDisplay => $"[{Identifier}] BaseUrl: '{BaseUrl}', MiddlewareCount: {_middleware.Count}";
 
 		/// <summary>
-		/// Get the identifier (key) for this instance, which is registered within the factory as.
+		/// Get the identifier (key) for this instance, which is registered with, within the factory.
 		/// </summary>
 		public string Identifier { get; }
 		public string BaseUrl { get; }
@@ -84,11 +86,11 @@ namespace FluentlyHttp
 			return formatter;
 		}
 
-		public FluentHttpRequestBuilder CreateRequest(string uri = null)
+		public FluentHttpRequestBuilder CreateRequest(string uriTemplate = null, object interpolationData = null)
 		{
 			var builder = ActivatorUtilities.CreateInstance<FluentHttpRequestBuilder>(_serviceProvider, this);
-			if (uri != null)
-				builder.WithUri(uri);
+			if (uriTemplate != null)
+				builder.WithUri(uriTemplate, interpolationData);
 			return builder;
 		}
 
@@ -102,7 +104,7 @@ namespace FluentlyHttp
 			httpClient.Timeout = options.Timeout;
 
 			foreach (var headerEntry in options.Headers)
-				httpClient.DefaultRequestHeaders.Add((string) headerEntry.Key, (string) headerEntry.Value);
+				httpClient.DefaultRequestHeaders.Add(headerEntry.Key, headerEntry.Value);
 
 			return httpClient;
 		}
@@ -140,9 +142,11 @@ namespace FluentlyHttp
 	{
 		public HttpMethod HttpMethod { get; private set; }
 		public string Uri { get; private set; }
+		public string UriTemplate { get; private set; }
 
 		private readonly FluentHttpClient _fluentHttpClient;
 		private static readonly HttpMethod HttpMethodPatch = new HttpMethod("Patch");
+		private static readonly Regex InterpolationRegex = new Regex(@"\{(\w+)\}", RegexOptions.Compiled);
 		private HttpContent _httpBody;
 
 		public FluentHttpRequestBuilder(FluentHttpClient fluentHttpClient)
@@ -150,6 +154,7 @@ namespace FluentlyHttp
 			_fluentHttpClient = fluentHttpClient;
 		}
 
+		#region HttpMethods
 		public FluentHttpRequestBuilder AsGet()
 		{
 			HttpMethod = HttpMethod.Get;
@@ -159,6 +164,36 @@ namespace FluentlyHttp
 		public FluentHttpRequestBuilder AsPost()
 		{
 			HttpMethod = HttpMethod.Post;
+			return this;
+		}
+
+		public FluentHttpRequestBuilder AsPut()
+		{
+			HttpMethod = HttpMethod.Put;
+			return this;
+		}
+
+		public FluentHttpRequestBuilder AsDelete()
+		{
+			HttpMethod = HttpMethod.Delete;
+			return this;
+		}
+		
+		public FluentHttpRequestBuilder AsOptions()
+		{
+			HttpMethod = HttpMethod.Options;
+			return this;
+		}
+		
+		public FluentHttpRequestBuilder AsHead()
+		{
+			HttpMethod = HttpMethod.Head;
+			return this;
+		}
+		
+		public FluentHttpRequestBuilder AsTrace()
+		{
+			HttpMethod = HttpMethod.Trace;
 			return this;
 		}
 
@@ -173,14 +208,23 @@ namespace FluentlyHttp
 			HttpMethod = method;
 			return this;
 		}
+		#endregion
 
-		public FluentHttpRequestBuilder WithUri(string uri, object interpolationData = null)
+		/// <summary>
+		/// Set the uri of the HTTP request with optional interpolations.
+		/// </summary>
+		/// <param name="uriTemplate">Uri resource template e.g. <c>"/org/{id}"</c></param>
+		/// <param name="interpolationData">Data to interpolate within the Uri template place holders e.g. <c>{id}</c>. Can be either dictionary or object.</param>
+		/// <returns></returns>
+		public FluentHttpRequestBuilder WithUri(string uriTemplate, object interpolationData = null)
 		{
-			Uri = uri;
-			// todo: interpolation
+			UriTemplate = uriTemplate;
+			Uri = interpolationData != null
+				? InterpolationRegex.ReplaceTokens(uriTemplate, interpolationData.ToDictionary())
+				: uriTemplate;
+
 			return this;
 		}
-
 
 		/// <summary>Set the body content of the HTTP request.</summary>
 		/// <param name="body">Value to serialize into the HTTP body content.</param>
@@ -208,7 +252,7 @@ namespace FluentlyHttp
 		/// <returns>Returns the request builder for chaining.</returns>
 		public FluentHttpRequestBuilder WithBody(object body, MediaTypeFormatter formatter, string mediaType = null)
 		{
-			return WithBodyContent(new ObjectContent(body.GetType(), body, formatter));
+			return WithBodyContent(new ObjectContent(body.GetType(), body, formatter, mediaType));
 		}
 
 		/// <summary>Set the body content of the HTTP request.</summary>
@@ -229,7 +273,6 @@ namespace FluentlyHttp
 			_httpBody = body;
 			return this;
 		}
-		
 
 		public async Task<T> Return<T>()
 		{
