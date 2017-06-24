@@ -1,4 +1,4 @@
-﻿using FluentlyHttp;
+﻿using FluentlyHttpClient;
 using Microsoft.Extensions.Logging;
 using Slabs.Experimental.ConsoleClient.Tests;
 using System.Threading.Tasks;

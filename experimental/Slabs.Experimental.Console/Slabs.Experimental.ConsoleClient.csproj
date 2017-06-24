@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentlyHttpClient" Version="0.2.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.CommandLine" Version="1.1.0" />
@@ -26,10 +27,6 @@
 
   <ItemGroup>
     <Folder Include="suite-configs\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\FluentlyHttp\FluentlyHttp.csproj" />
   </ItemGroup>
 
 </Project>
