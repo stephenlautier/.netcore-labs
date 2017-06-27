@@ -11,10 +11,9 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 	public class Common_TermsAndConditionsTest : ITest
 	{
 		private readonly ILogger _logger;
+		private readonly IFluentHttpClient _fluentHttpClient;
 
-		private readonly FluentHttpClient _fluentHttpClient;
-
-		public Common_TermsAndConditionsTest(ILogger<Common_TermsAndConditionsTest> logger, FluentHttpClientFactory fluentHttpClientFactory)
+		public Common_TermsAndConditionsTest(ILogger<Common_TermsAndConditionsTest> logger, IFluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_fluentHttpClient = fluentHttpClientFactory.Get("common");

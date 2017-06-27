@@ -1,4 +1,5 @@
 ﻿using FluentlyHttpClient;
+using FluentlyHttpClient.Middleware;
 using Microsoft.Extensions.Logging;
 using Slabs.Experimental.ConsoleClient.Tests;
 using System.Threading.Tasks;
@@ -9,9 +10,9 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 	{
 		private readonly ILogger<TestSuiteStartup> _logger;
 		private readonly TestSuiteBuilderFactory _testSuiteBuilderFactory;
-		private readonly FluentHttpClientFactory _fluentHttpClientFactory;
+		private readonly IFluentHttpClientFactory _fluentHttpClientFactory;
 
-		public TestSuiteStartup(ILogger<TestSuiteStartup> logger, TestSuiteBuilderFactory testSuiteBuilderFactory, FluentHttpClientFactory fluentHttpClientFactory)
+		public TestSuiteStartup(ILogger<TestSuiteStartup> logger, TestSuiteBuilderFactory testSuiteBuilderFactory, IFluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_testSuiteBuilderFactory = testSuiteBuilderFactory;
@@ -44,20 +45,20 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 		{
 			_fluentHttpClientFactory.CreateBuilder("auth")
 				// shared
-				.AddHeader("user-agent", "slabs-testify")
-				.AddHeader("Accept-Language", "en-GB")
-				.SetTimeout(5)
+				.WithHeader("user-agent", "slabs-testify")
+				.WithHeader("locale", "en-GB")
+				.WithTimeout(5)
 				.AddMiddleware<TimerHttpMiddleware>()
 				.AddMiddleware<LoggerHttpMiddleware>()
 
 				// auth
-				//.SetBaseUrl("http://staging.api.cpm-odin.com:1001")
-				.SetBaseUrl("http://localhost:2001")
+				//.WithBaseUrl("http://staging.api.cpm-odin.com:1001")
+				.WithBaseUrl("http://localhost:2001")
 				.Register()
 
 				// common
-				.SetIdentifier("common")
-				.SetBaseUrl("http://staging.api.cpm-odin.com:1002")
+				.Withdentifier("common")
+				.WithBaseUrl("http://staging.api.cpm-odin.com:1002")
 				.Register();
 		}
 	}

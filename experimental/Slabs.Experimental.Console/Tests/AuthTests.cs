@@ -11,10 +11,9 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 	{
 		private readonly ILogger _logger;
 		private readonly ISessionState _sessionState;
+		private readonly IFluentHttpClient _fluentHttpClient;
 
-		private readonly FluentHttpClient _fluentHttpClient;
-
-		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState, FluentHttpClientFactory fluentHttpClientFactory)
+		public Auth_LoginTest(ILogger<Auth_LoginTest> logger, ISessionState sessionState, IFluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_sessionState = sessionState;
@@ -53,9 +52,9 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 	{
 		private readonly ILogger _logger;
 		private readonly ISessionState _sessionState;
-		private readonly FluentHttpClient _fluentHttpClient;
+		private readonly IFluentHttpClient _fluentHttpClient;
 
-		public Auth_KeepAliveTest(ILogger<Auth_KeepAliveTest> logger, ISessionState sessionState, FluentHttpClientFactory fluentHttpClientFactory)
+		public Auth_KeepAliveTest(ILogger<Auth_KeepAliveTest> logger, ISessionState sessionState, IFluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
 			_sessionState = sessionState;
