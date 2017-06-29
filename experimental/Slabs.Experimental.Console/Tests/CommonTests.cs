@@ -16,7 +16,7 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		public Common_TermsAndConditionsTest(ILogger<Common_TermsAndConditionsTest> logger, IFluentHttpClientFactory fluentHttpClientFactory)
 		{
 			_logger = logger;
-			_fluentHttpClient = fluentHttpClientFactory.Get("common");
+			_fluentHttpClient = fluentHttpClientFactory.GetCommonClient();
 		}
 
 		public async Task Execute()

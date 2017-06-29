@@ -17,7 +17,7 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		{
 			_logger = logger;
 			_sessionState = sessionState;
-			_fluentHttpClient = fluentHttpClientFactory.Get("auth");
+			_fluentHttpClient = fluentHttpClientFactory.GetAuthClient();
 		}
 
 		public async Task Execute()
@@ -30,7 +30,7 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 			});
 
 			// fluent
-			var fluentResult = await _fluentHttpClient.CreateRequest("/api/auth/login")
+			LoginResponse fluentResult = await _fluentHttpClient.CreateRequest("/api/auth/login")
 				.AsPost()
 				.WithBody(new
 				{
@@ -58,7 +58,7 @@ namespace Slabs.Experimental.ConsoleClient.Tests
 		{
 			_logger = logger;
 			_sessionState = sessionState;
-			_fluentHttpClient = fluentHttpClientFactory.Get("auth");
+			_fluentHttpClient = fluentHttpClientFactory.GetAuthClient();
 		}
 
 		public async Task Execute()

@@ -48,8 +48,8 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 				.WithHeader("user-agent", "slabs-testify")
 				.WithHeader("locale", "en-GB")
 				.WithTimeout(5)
-				.AddMiddleware<TimerHttpMiddleware>()
-				.AddMiddleware<LoggerHttpMiddleware>()
+				.UseTimer()
+				.UseMiddleware<LoggerHttpMiddleware>()
 
 				// auth
 				//.WithBaseUrl("http://staging.api.cpm-odin.com:1001")
@@ -61,5 +61,11 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 				.WithBaseUrl("http://staging.api.cpm-odin.com:1002")
 				.Register();
 		}
+	}
+
+	public static class FluentHttpClientFactoryExtensions
+	{
+		public static IFluentHttpClient GetAuthClient(this IFluentHttpClientFactory factory) => factory.Get("auth");
+		public static IFluentHttpClient GetCommonClient(this IFluentHttpClientFactory factory) => factory.Get("common");
 	}
 }
