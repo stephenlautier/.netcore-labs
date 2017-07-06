@@ -1,15 +1,15 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Slabs.Experimental.ConsoleClient.Testify;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
-	// prebuilt pipe
-	// able to get args
+	// able to get args/result (cache pipe)
+	// change Func<Task> (invoke param) to PipelineContext
+
 	public class PipeTestStartup
 	{
 		private readonly ILogger _logger;
@@ -24,13 +24,17 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		public async Task Run()
 		{
 			_logger.LogInformation("Init Pipe Test...");
+			var pipeBuilder = _pipeBuilderFactory.Create()
+				.Add<TimerPipe>()
+				// .Add<CachePipe>()
+				;
+
 			var result = await GetFruit();
 
-			var pipeBuilder = _pipeBuilderFactory.Create()
-				.Add<TimerPipe>();
-
-			await pipeBuilder.Run(GetFruit);
-			await pipeBuilder.Run(GetFruit);
+			var pipeline = pipeBuilder.Build();
+			await pipeline.Run(GetFruit);
+			await pipeline.Run(GetFruit);
+			//var result = await pipeline.Run(GetFruit);
 
 			_logger.LogInformation($"[Pipe] Result={result}");
 		}
@@ -70,14 +74,12 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			return this;
 		}
 
-		public async Task Run(PipeDelegate action)
+		public PipeRuntime Build()
 		{
 			if (_pipes.Count == 0)
-			{
-				await action();
-				return;
-			}
+				throw new InvalidOperationException("Cannot build with zero pipes.");
 
+			Add<ActionExecutePipe>();
 			IPipe previous = null;
 			for (int i = _pipes.Count; i-- > 0;)
 			{
@@ -85,8 +87,8 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				var isLast = _pipes.Count - 1 == i;
 				var isFirst = i == 0;
 
-				var next = isLast
-					? action
+				PipeDelegate next = isLast
+					? (PipeDelegate)Stub
 					: previous.Invoke;
 
 				object[] ctor;
@@ -101,15 +103,27 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 				IPipe instance = (IPipe)ActivatorUtilities.CreateInstance(_serviceProvider, pipe.Type, ctor);
 				if (isFirst)
-					await instance.Invoke(); // todo: arg
-				else
-					previous = instance;
-
+					return new PipeRuntime(instance);
+				previous = instance;
 			}
+			throw new InvalidOperationException("Something went wrong!");
+
+			Task Stub(Func<Task> action) => Task.CompletedTask;
 		}
-		
 	}
-	
+
+	public class PipeRuntime
+	{
+		private readonly IPipe _pipeline;
+
+		public PipeRuntime(IPipe pipline)
+		{
+			_pipeline = pipline;
+		}
+
+		public Task Run(Func<Task> action) => _pipeline.Invoke(action);
+	}
+
 	public class PipeConfig
 	{
 		public Type Type { get; set; }
@@ -119,7 +133,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		public PipeConfig()
 		{
 		}
-		
+
 		public PipeConfig(Type type, object[] args)
 		{
 			Type = type;
@@ -134,29 +148,41 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 	public interface IPipe
 	{
-		Task Invoke();
+		Task Invoke(Func<Task> action);
 	}
-	public delegate Task PipeDelegate();
-	
+	public delegate Task PipeDelegate(Func<Task> action);
+
 	public class TimerPipe : IPipe
 	{
 		private readonly PipeDelegate _next;
 		private readonly ILogger _logger;
-		
+
 		public TimerPipe(PipeDelegate next, ILogger<TimerPipe> logger)
 		{
 			_next = next;
 			_logger = logger;
 		}
-		
-		public async Task Invoke()
+
+		public async Task Invoke(Func<Task> action)
 		{
 			var watch = Stopwatch.StartNew();
-			await _next();
+			await _next(action);
 			var elapsed = watch.Elapsed;
-			
+
 			if (_logger.IsEnabled(LogLevel.Information))
-				_logger.LogInformation("Executed action in {timeTakenMillis}ms", elapsed.TotalMilliseconds);	
+				_logger.LogInformation("Executed action in {timeTakenMillis}ms", elapsed.TotalMilliseconds);
+		}
+	}
+	public class ActionExecutePipe : IPipe
+	{
+		public ActionExecutePipe(PipeDelegate next)
+		{
+			_next = next;
+		}
+
+		public async Task Invoke(Func<Task> action)
+		{
+			await action();
 		}
 	}
 }
