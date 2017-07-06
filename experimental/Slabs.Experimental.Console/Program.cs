@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Slabs.Experimental.ConsoleClient.Pipe;
 using Slabs.Experimental.ConsoleClient.Testify;
 using System;
 
@@ -19,9 +20,11 @@ namespace Slabs.Experimental.ConsoleClient
 			var serviceProvider = new ServiceCollection()
 				.AddLogging()
 				.AddScoped<TestSuiteStartup>()
+				.AddScoped<PipeTestStartup>()
 				.AddSingleton<TestSuiteBuilderFactory>()
 				.AddScoped<ISessionState, SessionState>()
 				.AddFluentlyHttpClient()
+				.AddPipes()
 				.BuildServiceProvider();
 
 			var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
@@ -30,8 +33,9 @@ namespace Slabs.Experimental.ConsoleClient
 
 			var logger = loggerFactory.CreateLogger<Program>();
 
-			var testSuiteStartup = serviceProvider.GetService<TestSuiteStartup>();
-			testSuiteStartup.Run().Wait();
+			//var startup = serviceProvider.GetService<TestSuiteStartup>();
+			var startup = serviceProvider.GetService<PipeTestStartup>();
+			startup.Run().Wait();
 
 			logger.LogInformation("Press any key to stop...");
 			Console.ReadKey();
