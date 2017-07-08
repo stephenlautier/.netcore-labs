@@ -12,18 +12,18 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 	public class PipeTestStartup
 	{
 		private readonly ILogger _logger;
-		private readonly PipeBuilderFactory _pipeBuilderFactory;
+		private readonly PipelineBuilderFactory _pipelineBuilderFactory;
 
-		public PipeTestStartup(ILogger<PipeTestStartup> logger, PipeBuilderFactory pipeBuilderFactory)
+		public PipeTestStartup(ILogger<PipeTestStartup> logger, PipelineBuilderFactory pipelineBuilderFactory)
 		{
 			_logger = logger;
-			_pipeBuilderFactory = pipeBuilderFactory;
+			_pipelineBuilderFactory = pipelineBuilderFactory;
 		}
 
 		public async Task Run()
 		{
 			_logger.LogInformation("Init Pipe Test...");
-			var pipeBuilder = _pipeBuilderFactory.Create()
+			var pipeBuilder = _pipelineBuilderFactory.Create()
 				.Add<TimerPipe>()
 				// .Add<CachePipe>()
 				;
@@ -50,35 +50,35 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 	}
 
-	public class PipeBuilderFactory
+	public class PipelineBuilderFactory
 	{
 		private readonly IServiceProvider _serviceProvider;
 
-		public PipeBuilderFactory(IServiceProvider serviceProvider)
+		public PipelineBuilderFactory(IServiceProvider serviceProvider)
 		{
 			_serviceProvider = serviceProvider;
 		}
 
-		public PipeBuilder Create() => ActivatorUtilities.CreateInstance<PipeBuilder>(_serviceProvider);
+		public PipelineBuilder Create() => ActivatorUtilities.CreateInstance<PipelineBuilder>(_serviceProvider);
 	}
 
-	public class PipeBuilder
+	public class PipelineBuilder
 	{
 		private readonly IServiceProvider _serviceProvider;
 		private readonly List<PipeConfig> _pipes = new List<PipeConfig>();
 
-		public PipeBuilder(IServiceProvider serviceProvider)
+		public PipelineBuilder(IServiceProvider serviceProvider)
 		{
 			_serviceProvider = serviceProvider;
 		}
 
-		public PipeBuilder Add<T>(params object[] args)
+		public PipelineBuilder Add<T>(params object[] args)
 		{
 			_pipes.Add(new PipeConfig(typeof(T), args));
 			return this;
 		}
 
-		public PipeRuntime Build()
+		public Pipeline Build()
 		{
 			if (_pipes.Count == 0)
 				throw new InvalidOperationException("Cannot build with zero pipes.");
@@ -107,7 +107,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 				IPipe instance = (IPipe)ActivatorUtilities.CreateInstance(_serviceProvider, pipe.Type, ctor);
 				if (isFirst)
-					return new PipeRuntime(instance);
+					return new Pipeline(instance);
 				previous = instance;
 			}
 			throw new InvalidOperationException("Something went wrong!");
@@ -116,11 +116,11 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 	}
 
-	public class PipeRuntime
+	public class Pipeline
 	{
 		private readonly IPipe _pipeline;
 
-		public PipeRuntime(IPipe pipline)
+		public Pipeline(IPipe pipline)
 		{
 			_pipeline = pipline;
 		}

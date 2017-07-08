@@ -18,7 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
 		{
 			if (services == null) throw new ArgumentNullException(nameof(services));
 
-			services.AddSingleton<PipeBuilderFactory>();
+			services.AddSingleton<PipelineBuilderFactory>();
 
 			return services;
 		}
