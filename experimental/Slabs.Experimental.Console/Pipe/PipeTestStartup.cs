@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,8 +6,6 @@ using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
-	// able to get args/result (cache pipe)
-
 	public class PipeTestStartup
 	{
 		private readonly ILogger _logger;
@@ -25,7 +22,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_logger.LogInformation("Init Pipe Test...");
 			var pipeBuilder = _pipelineBuilderFactory.Create()
 				.Add<TimerPipe>()
-				// .Add<CachePipe>()
+				.Add<CachePipe>()
 				;
 
 			var pipeline = pipeBuilder.Build();
@@ -38,6 +35,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 		public async Task<string> GetFruit()
 		{
+			_logger.LogInformation($"[Service] Get fruit...");
 			await Task.Delay(250);
 			return "strawberry";
 		}
@@ -47,72 +45,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_logger.LogInformation($"[Service] Set fruit...");
 			await Task.Delay(100);
 			_logger.LogInformation($"[Service] Set fruit complete");
-		}
-	}
-
-	public class PipelineBuilderFactory
-	{
-		private readonly IServiceProvider _serviceProvider;
-
-		public PipelineBuilderFactory(IServiceProvider serviceProvider)
-		{
-			_serviceProvider = serviceProvider;
-		}
-
-		public PipelineBuilder Create() => ActivatorUtilities.CreateInstance<PipelineBuilder>(_serviceProvider);
-	}
-
-	public class PipelineBuilder
-	{
-		private readonly IServiceProvider _serviceProvider;
-		private readonly List<PipeConfig> _pipes = new List<PipeConfig>();
-
-		public PipelineBuilder(IServiceProvider serviceProvider)
-		{
-			_serviceProvider = serviceProvider;
-		}
-
-		public PipelineBuilder Add<T>(params object[] args)
-		{
-			_pipes.Add(new PipeConfig(typeof(T), args));
-			return this;
-		}
-
-		public Pipeline Build()
-		{
-			if (_pipes.Count == 0)
-				throw new InvalidOperationException("Cannot build pipeline with zero pipes.");
-
-			Add<ActionExecutePipe>();
-			IPipe previous = null;
-			for (int i = _pipes.Count; i-- > 0;)
-			{
-				var pipe = _pipes[i];
-				var isLast = _pipes.Count - 1 == i;
-				var isFirst = i == 0;
-
-				PipeDelegate next = isLast
-					? (PipeDelegate)Stub
-					: previous.Invoke;
-
-				object[] ctor;
-				if (pipe.Args == null)
-					ctor = new object[] { next };
-				else
-				{
-					ctor = new object[pipe.Args.Length + 1];
-					ctor[0] = next;
-					Array.Copy(pipe.Args, 0, ctor, 1, pipe.Args.Length);
-				}
-
-				IPipe instance = (IPipe)ActivatorUtilities.CreateInstance(_serviceProvider, pipe.Type, ctor);
-				if (isFirst)
-					return new Pipeline(instance);
-				previous = instance;
-			}
-			throw new InvalidOperationException("Something went wrong!");
-
-			Task<object> Stub(PipelineContext context) => Task.FromResult<object>(null);
 		}
 	}
 
@@ -149,40 +81,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 	}
 
-	public class PipeConfig
-	{
-		public Type Type { get; set; }
-
-		public object[] Args { get; set; }
-
-		public PipeConfig()
-		{
-		}
-
-		public PipeConfig(Type type, object[] args)
-		{
-			Type = type;
-			Args = args;
-		}
-
-		/// <summary>
-		/// Destructuring.
-		/// </summary>
-		public void Deconstruct(out Type type, out object[] args) { type = Type; args = Args; }
-	}
-
-	public class PipelineContext
-	{
-		public Func<Task<object>> Func { get; set; }
-	}
-
-	public interface IPipe
-	{
-		Task<object> Invoke(PipelineContext context);
-	}
-
-	public delegate Task<object> PipeDelegate(PipelineContext context);
-
 	public class TimerPipe : IPipe
 	{
 		private readonly PipeDelegate _next;
@@ -205,13 +103,57 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			return result;
 		}
 	}
-
-	public class ActionExecutePipe : IPipe
+	public class CachePipe : IPipe
 	{
-		public ActionExecutePipe(PipeDelegate next)
+		private readonly PipeDelegate _next;
+		private readonly ILogger _logger;
+		private readonly CacheService _cacheService = new CacheService();
+
+		public CachePipe(PipeDelegate next, ILogger<CachePipe> logger)
 		{
+			_next = next;
+			_logger = logger;
 		}
 
-		public async Task<object> Invoke(PipelineContext context) => await context.Func();
+		public async Task<object> Invoke(PipelineContext context)
+		{
+			// todo: dont cache without result? e.g. Set
+			// todo: build cache key from args
+			string cacheKey = "";
+			_logger.LogInformation("Cache key: {key}", cacheKey);
+
+			var cacheValue = _cacheService.Get(cacheKey);
+			if (cacheValue != null)
+			{
+				_logger.LogInformation("Return from cache", cacheKey);
+				return cacheValue;
+			}
+			
+			var result = await _next(context);
+			_cacheService.Set(cacheKey, result);
+			
+			return result;
+		}
 	}
+
+	/// <summary>
+	/// Simple Caching for POC.
+	/// </summary>
+	public class CacheService
+	{
+		private readonly IDictionary<string, object> _items = new Dictionary<string, object>();
+
+		public T Get<T>(string key)
+		{
+			if (_items.TryGetValue(key, out var value))
+				return (T)value;
+			return default(T);
+		}
+
+		public object Get(string key) => _items.TryGetValue(key, out var value) ? value : null;
+
+
+		public void Set(string key, object value) => _items.Add(key, value);
+	}
+
 }
