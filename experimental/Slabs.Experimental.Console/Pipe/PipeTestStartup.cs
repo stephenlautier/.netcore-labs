@@ -1,7 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe

@@ -36,7 +36,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			var cacheValue = _cacheService.Get(cacheKey);
 			if (cacheValue != null)
 			{
-				_logger.LogInformation("Return from cache", cacheKey);
+				_logger.LogInformation("Return from cache for {key}", cacheKey);
 				return cacheValue;
 			}
 
