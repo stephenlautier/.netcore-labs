@@ -117,6 +117,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 		public async Task<object> Invoke(PipelineContext context)
 		{
+			// todo: need to have a cache key per function or hash e.g. GetHero() and GetFruit() shouldnt return from same cache. Perhaps add args to pipe
 			// todo: dont cache without result? e.g. Set
 			// todo: build cache key from args
 			string cacheKey = "";
