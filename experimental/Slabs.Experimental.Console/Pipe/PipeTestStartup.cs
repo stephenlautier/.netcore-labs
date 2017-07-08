@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
 	// able to get args/result (cache pipe)
-	// change Func<Task> (invoke param) to PipelineContext
 
 	public class PipeTestStartup
 	{
@@ -113,7 +112,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			}
 			throw new InvalidOperationException("Something went wrong!");
 
-			Task<object> Stub(Func<Task<object>> action) => Task.FromResult<object>(null);
+			Task<object> Stub(PipelineContext context) => Task.FromResult<object>(null);
 		}
 	}
 
@@ -134,10 +133,10 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				return r;
 			}
 
-			var result = await _pipeline.Invoke(ToObjectFunc);
+			var result = await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc });
 			return (T)result;
 		}
-		
+
 		public async Task Run(Func<Task> action)
 		{
 			async Task<object> ToObjectFunc()
@@ -146,7 +145,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				return null;
 			}
 
-			await _pipeline.Invoke(ToObjectFunc);
+			await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc });
 		}
 	}
 
@@ -172,12 +171,17 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		public void Deconstruct(out Type type, out object[] args) { type = Type; args = Args; }
 	}
 
-	public interface IPipe
+	public class PipelineContext
 	{
-		Task<object> Invoke(Func<Task<object>> action);
+		public Func<Task<object>> Func { get; set; }
 	}
 
-	public delegate Task<object> PipeDelegate(Func<Task<object>> action);
+	public interface IPipe
+	{
+		Task<object> Invoke(PipelineContext context);
+	}
+
+	public delegate Task<object> PipeDelegate(PipelineContext context);
 
 	public class TimerPipe : IPipe
 	{
@@ -190,10 +194,10 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_logger = logger;
 		}
 
-		public async Task<object> Invoke(Func<Task<object>> action)
+		public async Task<object> Invoke(PipelineContext context)
 		{
 			var watch = Stopwatch.StartNew();
-			var result = await _next(action);
+			var result = await _next(context);
 			var elapsed = watch.Elapsed;
 
 			if (_logger.IsEnabled(LogLevel.Information))
@@ -201,12 +205,13 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			return result;
 		}
 	}
+
 	public class ActionExecutePipe : IPipe
 	{
 		public ActionExecutePipe(PipeDelegate next)
 		{
 		}
 
-		public async Task<object> Invoke(Func<Task<object>> action) => await action();
+		public async Task<object> Invoke(PipelineContext context) => await context.Func();
 	}
 }
