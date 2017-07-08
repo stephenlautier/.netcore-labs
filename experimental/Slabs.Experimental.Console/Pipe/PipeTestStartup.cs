@@ -29,20 +29,25 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				// .Add<CachePipe>()
 				;
 
-			var result = await GetFruit();
-
 			var pipeline = pipeBuilder.Build();
-			await pipeline.Run(GetFruit);
-			await pipeline.Run(GetFruit);
-			//var result = await pipeline.Run(GetFruit);
+			var r1 = await pipeline.Run(GetFruit);
+			var r2 = await pipeline.Run(GetFruit);
+			await pipeline.Run(SetFruit);
 
-			_logger.LogInformation($"[Pipe] Result={result}");
+			_logger.LogInformation($"[Pipe] Result={r1} R2={r2}");
 		}
 
-		public async Task<object> GetFruit()
+		public async Task<string> GetFruit()
 		{
 			await Task.Delay(250);
 			return "strawberry";
+		}
+
+		public async Task SetFruit()
+		{
+			_logger.LogInformation($"[Service] Set fruit...");
+			await Task.Delay(100);
+			_logger.LogInformation($"[Service] Set fruit complete");
 		}
 	}
 
@@ -108,7 +113,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			}
 			throw new InvalidOperationException("Something went wrong!");
 
-			Task Stub(Func<Task> action) => Task.CompletedTask;
+			Task<object> Stub(Func<Task<object>> action) => Task.FromResult<object>(null);
 		}
 	}
 
@@ -121,7 +126,28 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_pipeline = pipline;
 		}
 
-		public Task Run(Func<Task> action) => _pipeline.Invoke(action);
+		public async Task<T> Run<T>(Func<Task<T>> action)
+		{
+			async Task<object> ToObjectFunc()
+			{
+				var r = await action();
+				return r;
+			}
+
+			var result = await _pipeline.Invoke(ToObjectFunc);
+			return (T)result;
+		}
+		
+		public async Task Run(Func<Task> action)
+		{
+			async Task<object> ToObjectFunc()
+			{
+				await action();
+				return null;
+			}
+
+			await _pipeline.Invoke(ToObjectFunc);
+		}
 	}
 
 	public class PipeConfig
@@ -148,9 +174,10 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 	public interface IPipe
 	{
-		Task Invoke(Func<Task> action);
+		Task<object> Invoke(Func<Task<object>> action);
 	}
-	public delegate Task PipeDelegate(Func<Task> action);
+
+	public delegate Task<object> PipeDelegate(Func<Task<object>> action);
 
 	public class TimerPipe : IPipe
 	{
@@ -163,14 +190,15 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_logger = logger;
 		}
 
-		public async Task Invoke(Func<Task> action)
+		public async Task<object> Invoke(Func<Task<object>> action)
 		{
 			var watch = Stopwatch.StartNew();
-			await _next(action);
+			var result = await _next(action);
 			var elapsed = watch.Elapsed;
 
 			if (_logger.IsEnabled(LogLevel.Information))
 				_logger.LogInformation("Executed action in {timeTakenMillis}ms", elapsed.TotalMilliseconds);
+			return result;
 		}
 	}
 	public class ActionExecutePipe : IPipe
@@ -179,9 +207,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		{
 		}
 
-		public async Task Invoke(Func<Task> action)
-		{
-			await action();
-		}
+		public async Task<object> Invoke(Func<Task<object>> action) => await action();
 	}
 }
