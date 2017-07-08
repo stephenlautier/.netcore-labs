@@ -1,11 +1,22 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
+using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.InteropServices.ComTypes;
 using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
+	public class Hero
+	{
+		public string Name { get; set; }
+
+		public override string ToString() => $"Name: '{Name}'";
+	}
+	
+	/*
+	 * - skip pipe (within run)
+	 */
 	public class PipeTestStartup
 	{
 		private readonly ILogger _logger;
@@ -26,11 +37,12 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				;
 
 			var pipeline = pipeBuilder.Build();
-			var r1 = await pipeline.Run(GetFruit);
-			var r2 = await pipeline.Run(GetFruit);
-			await pipeline.Run(SetFruit);
+			var r1 = await pipeline.Run(GetFruit, new PipelineOptions().SetCache("get-fruit"));
+			var r2 = await pipeline.Run(GetFruit, new PipelineOptions().SetCache("get-fruit"));
+			var hero = await pipeline.Run(GetHero, new PipelineOptions().SetCache("get-hero"));
+			await pipeline.Run(SetFruit, new PipelineOptions().SetNoCache());
 
-			_logger.LogInformation($"[Pipe] Result={r1} R2={r2}");
+			_logger.LogInformation("[Pipe] Result={r1} R2={r2}, Hero={hero}", r1, r2, hero.ToString());
 		}
 
 		public async Task<string> GetFruit()
@@ -40,6 +52,16 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			return "strawberry";
 		}
 
+		public async Task<Hero> GetHero()
+		{
+			_logger.LogInformation($"[Service] Get Hero...");
+			await Task.Delay(250);
+			return new Hero
+			{
+				Name = "Rexxar"
+			};
+		}
+
 		public async Task SetFruit()
 		{
 			_logger.LogInformation($"[Service] Set fruit...");
@@ -47,39 +69,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_logger.LogInformation($"[Service] Set fruit complete");
 		}
 	}
-
-	public class Pipeline
-	{
-		private readonly IPipe _pipeline;
-
-		public Pipeline(IPipe pipline)
-		{
-			_pipeline = pipline;
-		}
-
-		public async Task<T> Run<T>(Func<Task<T>> action)
-		{
-			async Task<object> ToObjectFunc()
-			{
-				var r = await action();
-				return r;
-			}
-
-			var result = await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc });
-			return (T)result;
-		}
-
-		public async Task Run(Func<Task> action)
-		{
-			async Task<object> ToObjectFunc()
-			{
-				await action();
-				return null;
-			}
-
-			await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc });
-		}
-	}
+	
 
 	public class TimerPipe : IPipe
 	{
@@ -117,10 +107,18 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 		public async Task<object> Invoke(PipelineContext context)
 		{
-			// todo: need to have a cache key per function or hash e.g. GetHero() and GetFruit() shouldnt return from same cache. Perhaps add args to pipe
-			// todo: dont cache without result? e.g. Set
+			var options = context.Options.GetCache();
+			if (options == null)
+				throw new InvalidOperationException("CachePipe requires CacheOptions.");
+
+			if(options.SkipCache)
+				return await _next(context);
+
+			if (string.IsNullOrEmpty(options.Key))
+				throw new InvalidOperationException("CacheOptions key was not set.");
+
 			// todo: build cache key from args
-			string cacheKey = "";
+			string cacheKey = options.Key;
 			_logger.LogInformation("Cache key: {key}", cacheKey);
 
 			var cacheValue = _cacheService.Get(cacheKey);
@@ -129,12 +127,41 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				_logger.LogInformation("Return from cache", cacheKey);
 				return cacheValue;
 			}
-			
+
 			var result = await _next(context);
 			_cacheService.Set(cacheKey, result);
-			
+
 			return result;
 		}
+	}
+
+
+	public static class PipelineCacheOptionsExtensions
+	{
+		private const string CacheKey = "CACHE";
+		
+		public static PipelineOptions SetNoCache(this PipelineOptions pipelineOptions)
+			=> pipelineOptions.SetCache(new CacheOptions
+			{
+				SkipCache = true
+			});
+
+		public static PipelineOptions SetCache(this PipelineOptions pipelineOptions, string key)
+			=> pipelineOptions.SetCache(new CacheOptions
+			{
+				Key = key
+			});
+
+		public static PipelineOptions SetCache(this PipelineOptions pipelineOptions, CacheOptions options)
+			=> pipelineOptions.Set(CacheKey, options);
+
+		public static CacheOptions GetCache(this PipelineOptions pipelineOptions) => pipelineOptions.Get<CacheOptions>(CacheKey);
+	}
+
+	public class CacheOptions
+	{
+		public string Key { get; set; }
+		public bool SkipCache { get; set; }
 	}
 
 	/// <summary>
@@ -156,5 +183,4 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 		public void Set(string key, object value) => _items.Add(key, value);
 	}
-
 }

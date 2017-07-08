@@ -1,7 +1,7 @@
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
@@ -30,6 +30,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 	public class PipelineContext
 	{
 		public Func<Task<object>> Func { get; set; }
+		public PipelineOptions Options { get; set; }
 	}
 
 	public class PipelineBuilderFactory
