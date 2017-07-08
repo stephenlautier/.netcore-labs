@@ -81,7 +81,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		public Pipeline Build()
 		{
 			if (_pipes.Count == 0)
-				throw new InvalidOperationException("Cannot build with zero pipes.");
+				throw new InvalidOperationException("Cannot build pipeline with zero pipes.");
 
 			Add<ActionExecutePipe>();
 			IPipe previous = null;
