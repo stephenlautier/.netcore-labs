@@ -177,7 +177,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 	{
 		public ActionExecutePipe(PipeDelegate next)
 		{
-			_next = next;
 		}
 
 		public async Task Invoke(Func<Task> action)
