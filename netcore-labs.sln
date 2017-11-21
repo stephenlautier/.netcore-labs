@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.13
+VisualStudioVersion = 15.0.27004.2005
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.SimpleDockerApi", "simple-docker-api\Slabs.SimpleDockerApi\Slabs.SimpleDockerApi.csproj", "{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061}"
 EndProject
@@ -30,9 +30,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Gra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Silo", "orleans-match-history\Slabs.MatchHistory.SiloHost\Slabs.MatchHistory.Silo.csproj", "{020309F3-529D-4BB0-86E0-8736E70FFDDB}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Foldy", "Foldy", "{D5A9FB25-B32C-4425-A183-CDC9EB07F862}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fody", "Fody", "{D5A9FB25-B32C-4425-A183-CDC9EB07F862}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slabs.FoldySample", "Slabs.FoldySample\Slabs.FoldySample.csproj", "{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.FodySample", "Slabs.FodySample\Slabs.FodySample.csproj", "{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,5 +81,8 @@ Global
 		{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8} = {08DA5202-1453-49AA-B2FA-964C82078159}
 		{020309F3-529D-4BB0-86E0-8736E70FFDDB} = {08DA5202-1453-49AA-B2FA-964C82078159}
 		{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A} = {D5A9FB25-B32C-4425-A183-CDC9EB07F862}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2EB6338D-D437-4029-B90F-2ACB272DA063}
 	EndGlobalSection
 EndGlobal
