@@ -1,8 +1,13 @@
-version: "3"
+version: '3'
 
 services:
   api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
     ports:
-      - "5010:80"
+      - "80"
+      # - "5010:80"
+networks:
+  default:
+    external:
+      name: nat
