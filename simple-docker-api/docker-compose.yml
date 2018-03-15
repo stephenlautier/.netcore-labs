@@ -4,12 +4,12 @@ services:
   api:
     image: stephenlautier/slabs-simple-api
     build:
-      context: ./Slabs.SimpleDockerApi
-      dockerfile: Dockerfile
-
-  slabs.aspnetcore:
-    image: slabs.aspnetcore
-    build:
       context: .
-      dockerfile: Slabs.AspnetCore\Dockerfile
+      dockerfile: Slabs.SimpleDockerApi/Dockerfile
+
+  # slabs.aspnetcore:
+  #   image: slabs.aspnetcore
+  #   build:
+  #     context: .
+  #     dockerfile: Slabs.AspnetCore\Dockerfile
 
