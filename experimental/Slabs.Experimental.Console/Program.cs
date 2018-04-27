@@ -33,6 +33,7 @@ namespace Slabs.Experimental.ConsoleClient
 				.AddLogging(x => x.AddSerilog(loggerConfig))
 				.AddScoped<TestSuiteStartup>()
 				.AddScoped<PipeTestStartup>()
+				.AddScoped<GitStartup>()
 				.AddSingleton<TestSuiteBuilderFactory>()
 				.AddScoped<ISessionState, SessionState>()
 				.AddFluentlyHttpClient()
@@ -43,6 +44,7 @@ namespace Slabs.Experimental.ConsoleClient
 			var logger = loggerFactory.CreateLogger<Program>();
 
 			//var startup = serviceProvider.GetService<TestSuiteStartup>();
+			//var startup = serviceProvider.GetService<GitStartup>();
 			var startup = serviceProvider.GetService<PipeTestStartup>();
 			try
 			{
