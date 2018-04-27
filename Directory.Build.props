@@ -10,7 +10,7 @@
     <Company>Slabs</Company>
     <Product>Slabs Experimental</Product>
     <Copyright>© Slabs. All rights reserved.</Copyright>
-    <RepositoryUrl>https://github.com/stephenlautier/.netcore-labs//RepositoryUrl>
+    <RepositoryUrl>https://github.com/stephenlautier/.netcore-labs/</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
