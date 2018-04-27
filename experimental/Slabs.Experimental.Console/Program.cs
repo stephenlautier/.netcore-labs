@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -20,8 +21,11 @@ namespace Slabs.Experimental.ConsoleClient
 			var config = configBuilder.Build();
 
 			var loggerConfig = new LoggerConfiguration()
-				.WriteTo.Console()
+				.WriteTo.Console(outputTemplate: "[{Timestamp:HH:mm:ss} {Level:u3}] [{SourceContext:l}] {Message:lj}{NewLine}{Exception}")
 				.ReadFrom.Configuration(config)
+					.Enrich.FromLogContext()
+					.Enrich.WithMachineName()
+					.Enrich.WithDemystifiedStackTraces()
 				.CreateLogger()
 				;
 
@@ -40,7 +44,15 @@ namespace Slabs.Experimental.ConsoleClient
 
 			//var startup = serviceProvider.GetService<TestSuiteStartup>();
 			var startup = serviceProvider.GetService<PipeTestStartup>();
-			startup.Run().Wait();
+			try
+			{
+				startup.Run().Wait();
+			}
+			catch (Exception ex)
+			{
+				logger.LogError(ex, "Error while running.");
+				throw;
+			}
 
 			logger.LogInformation("Press any key to stop...");
 			//Console.ReadKey();
