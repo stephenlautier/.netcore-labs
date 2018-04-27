@@ -56,8 +56,15 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 
 		public PipelineBuilder Add<T>(params object[] args)
+			where T : IPipe
+			=> Add(typeof(T), args);
+
+		public PipelineBuilder Add(Type type, params object[] args)
 		{
-			_pipes.Add(new PipeConfig(typeof(T), args));
+			if(!typeof(IPipe).IsAssignableFrom(type))
+				throw new ArgumentException($"Type '{type.FullName}' must implement {nameof(IPipe)}.", nameof(type));
+
+			_pipes.Add(new PipeConfig(type, args));
 			return this;
 		}
 

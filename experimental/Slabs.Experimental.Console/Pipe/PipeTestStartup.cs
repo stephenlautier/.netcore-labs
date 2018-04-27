@@ -39,7 +39,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			var hero = await pipeline.Run(GetHero, new PipelineOptions().SetCache("get-hero"));
 			await pipeline.Run(SetFruit, new PipelineOptions().SetNoCache());
 
-			_logger.LogInformation("[Pipe] Result={r1} R2={r2}, Hero={hero}", r1, r2, hero.ToString());
+			_logger.LogInformation("[Pipe] Result={result1} R2={result2}, Hero: {@hero}", r1, r2, hero);
 		}
 
 		public async Task<string> GetFruit()
@@ -81,12 +81,14 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 		public async Task<object> Invoke(PipelineContext context)
 		{
+			if (!_logger.IsEnabled(LogLevel.Debug))
+				return await _next(context);
+
 			var watch = Stopwatch.StartNew();
 			var result = await _next(context);
 			var elapsed = watch.Elapsed;
 
-			if (_logger.IsEnabled(LogLevel.Information))
-				_logger.LogInformation("Executed action in {timeTakenMillis}ms", elapsed.TotalMilliseconds);
+			_logger.LogDebug("Executed action in {timeTakenMillis:n0}ms", elapsed.TotalMilliseconds);
 			return result;
 		}
 	}

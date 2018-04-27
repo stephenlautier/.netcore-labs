@@ -10,10 +10,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 
 		public PipelineOptions Set(string key, object value)
 		{
-			if (_options.ContainsKey(key))
-				_options[key] = value;
-			else
-				_options.Add(key, value);
+			_options[key] = value;
 			return this;
 		}
 		public object Get(string key) => _options.ContainsKey(key) ? _options[key] : null;
@@ -25,7 +22,9 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 	}
 
-
+	/// <summary>
+	/// Pipeline runner/executor.
+	/// </summary>
 	public class Pipeline
 	{
 		private readonly IPipe _pipeline;
