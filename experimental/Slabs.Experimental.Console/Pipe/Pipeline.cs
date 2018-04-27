@@ -40,6 +40,13 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_pipeline = pipline;
 		}
 
+		public Task<T> Run<T>(Func<Task<T>> action, Action<PipelineOptions> configure)
+		{
+			var options = new PipelineOptions();
+			configure?.Invoke(options);
+			return Run(action, options);
+		}
+
 		public async Task<T> Run<T>(Func<Task<T>> action, PipelineOptions options = null)
 		{
 			options = options ?? _defaultOptions;
@@ -53,6 +60,13 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			return (T)result;
 		}
 
+		public Task Run(Func<Task> action, Action<PipelineOptions> configure)
+		{
+			var options = new PipelineOptions();
+			configure?.Invoke(options);
+			return Run(action, options);
+		}
+
 		public async Task Run(Func<Task> action, PipelineOptions options = null)
 		{
 			options = options ?? _defaultOptions;
@@ -61,7 +75,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				await action();
 				return null;
 			}
-
 			await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc, Options = options });
 		}
 	}

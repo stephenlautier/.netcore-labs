@@ -5,12 +5,18 @@ using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
+	/// <summary>
+	/// Represents a method invocation.
+	/// </summary>
 	public class PipelineContext
 	{
-		public Func<Task<object>> Func { get; set; }
+		internal Func<Task<object>> Func { get; set; }
 		public PipelineOptions Options { get; set; }
 	}
 
+	/// <summary>
+	/// Pipeline producer.
+	/// </summary>
 	public class PipelineBuilderFactory
 	{
 		private readonly IServiceProvider _serviceProvider;
@@ -33,10 +39,21 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_serviceProvider = serviceProvider;
 		}
 
+		/// <summary>
+		/// Add pipe middleware, they will execute according to the order they are registered.
+		/// </summary>
+		/// <param name="args">Additional arguments to be used within the pipe ctor.</param>
+		/// <returns></returns>
 		public PipelineBuilder Add<T>(params object[] args)
 			where T : IPipe
 			=> Add(typeof(T), args);
 
+		/// <summary>
+		/// Add pipe middleware, they will execute according to the order they are registered.
+		/// </summary>
+		/// <param name="type">Pipe type which must implements <see cref="IPipe"/>.</param>
+		/// <param name="args">Additional arguments to be used within the pipe ctor.</param>
+		/// <returns></returns>
 		public PipelineBuilder Add(Type type, params object[] args)
 		{
 			if(!typeof(IPipe).IsAssignableFrom(type))
@@ -46,6 +63,10 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			return this;
 		}
 
+		/// <summary>
+		/// Build configured <see cref="Pipeline"/>.
+		/// </summary>
+		/// <returns></returns>
 		public Pipeline Build()
 		{
 			if (_pipes.Count == 0)
@@ -84,6 +105,9 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 	}
 
+	/// <summary>
+	/// Action invoker pipe, which actually triggers the users defined function. Generally invoked as the last pipe.
+	/// </summary>
 	public class ActionExecutePipe : IPipe
 	{
 		public ActionExecutePipe(PipeDelegate next)

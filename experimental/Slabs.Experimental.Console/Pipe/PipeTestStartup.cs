@@ -33,10 +33,10 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 				;
 
 			var pipeline = pipeBuilder.Build();
-			var r1 = await pipeline.Run(GetFruit, new PipelineOptions().SetCache("get-fruit"));
-			var r2 = await pipeline.Run(GetFruit, new PipelineOptions().SetCache("get-fruit"));
-			var hero = await pipeline.Run(GetHero, new PipelineOptions().SetCache("get-hero"));
-			await pipeline.Run(SetFruit, new PipelineOptions().SetNoCache());
+			var r1 = await pipeline.Run(GetFruit, opts => opts.SetCache("get-fruit"));
+			var r2 = await pipeline.Run(GetFruit, opts => opts.SetCache("get-fruit"));
+			var hero = await pipeline.Run(GetHero, opts => opts.SetCache("get-hero"));
+			await pipeline.Run(SetFruit, opts => opts.SetNoCache());
 
 			_logger.LogInformation("[Pipe] Result={result1} R2={result2}, Hero: {@hero}", r1, r2, hero);
 		}
