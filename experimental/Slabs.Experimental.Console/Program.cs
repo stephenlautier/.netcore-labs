@@ -11,10 +11,8 @@ namespace Slabs.Experimental.ConsoleClient
 	{
 		static void Main(string[] args)
 		{
-			var serilog = new LoggerConfiguration()
-				.Enrich.FromLogContext()
-				.MinimumLevel.Debug()
-				.WriteTo.ColoredConsole()
+			var loggerConfig = new LoggerConfiguration()
+				.WriteTo.Console()
 				.CreateLogger();
 
 			var serviceProvider = new ServiceCollection()
@@ -28,7 +26,7 @@ namespace Slabs.Experimental.ConsoleClient
 				.BuildServiceProvider();
 
 			var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-			loggerFactory.AddSerilog(serilog)
+			loggerFactory.AddSerilog(loggerConfig)
 				.AddDebug();
 
 			var logger = loggerFactory.CreateLogger<Program>();
@@ -38,7 +36,7 @@ namespace Slabs.Experimental.ConsoleClient
 			startup.Run().Wait();
 
 			logger.LogInformation("Press any key to stop...");
-			Console.ReadKey();
+			//Console.ReadKey();
 		}
 
 	}

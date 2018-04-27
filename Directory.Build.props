@@ -1,0 +1,35 @@
+<Project>
+  <!-- Set the repository root into a variable -->
+  <PropertyGroup>
+    <SourceRoot>$(MSBuildThisFileDirectory)</SourceRoot>
+  </PropertyGroup>
+
+  <!-- Set common properties regarding assembly information and nuget packages -->
+  <PropertyGroup>
+    <Authors>Stephen Lautier</Authors>
+    <Company>Slabs</Company>
+    <Product>Slabs Experimental</Product>
+    <Copyright>© Slabs. All rights reserved.</Copyright>
+    <RepositoryUrl>https://github.com/stephenlautier/.netcore-labs//RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <!-- Common compile parameters -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <NoWarn>$(NoWarn);1701;1702;1705;1591</NoWarn>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <!-- Shared Package Versions -->
+  <PropertyGroup>
+    <!-- vendors -->
+    <!-- <OrleansVersion>2.0.0</OrleansVersion> -->
+
+    <!-- pkgs -->
+  </PropertyGroup>
+</Project>
