@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
@@ -64,32 +63,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_logger.LogInformation($"[Service] Set fruit...");
 			await Task.Delay(100);
 			_logger.LogInformation($"[Service] Set fruit complete");
-		}
-	}
-	
-
-	public class TimerPipe : IPipe
-	{
-		private readonly PipeDelegate _next;
-		private readonly ILogger _logger;
-
-		public TimerPipe(PipeDelegate next, ILogger<TimerPipe> logger)
-		{
-			_next = next;
-			_logger = logger;
-		}
-
-		public async Task<object> Invoke(PipelineContext context)
-		{
-			if (!_logger.IsEnabled(LogLevel.Debug))
-				return await _next(context);
-
-			var watch = Stopwatch.StartNew();
-			var result = await _next(context);
-			var elapsed = watch.Elapsed;
-
-			_logger.LogDebug("Executed action in {timeTakenMillis:n0}ms", elapsed.TotalMilliseconds);
-			return result;
 		}
 	}
 }

@@ -13,7 +13,12 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			_options[key] = value;
 			return this;
 		}
-		public object Get(string key) => _options.ContainsKey(key) ? _options[key] : null;
+
+		public object Get(string key)
+		{
+			_options.TryGetValue(key, out var value);
+			return value;
+		}
 
 		public T Get<T>(string key)
 		{
