@@ -10,9 +10,9 @@ namespace Slabs.AspnetCore.Controllers
 	[Route("api/[controller]")]
 	public class HeroesController : Controller
 	{
-		private readonly HeroService _service;
+		private readonly IHeroService _service;
 
-		public HeroesController(HeroService service)
+		public HeroesController(IHeroService service)
 		{
 			_service = service;
 		}

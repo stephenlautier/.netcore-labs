@@ -7,7 +7,14 @@ using Slabs.AspnetCore.Infrastructure;
 
 namespace Slabs.AspnetCore.Heroes
 {
-	public class HeroService
+	public interface IHeroService
+	{
+		Task<ICollection<Hero>> GetAll();
+		Task<Hero> GetByKey(string key);
+		Task Add(Hero input);
+	}
+
+	public class HeroService : IHeroService
 	{
 		private readonly ICollection<Hero> _data = new List<Hero>
 		{

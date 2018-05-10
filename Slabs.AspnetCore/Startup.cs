@@ -1,11 +1,12 @@
-﻿using MessagePack.AspNetCoreMvcFormatter;
+﻿using Grace.DependencyInjection;
+using MessagePack.AspNetCoreMvcFormatter;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Slabs.AspnetCore.Controllers;
 using Slabs.AspnetCore.Heroes;
+using Slabs.AspnetCore.Infrastructure;
 
 namespace Slabs.AspnetCore
 {
@@ -21,7 +22,8 @@ namespace Slabs.AspnetCore
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
-			services.AddSingleton<HeroService>();
+			//services.AddSingleton<IHeroService, HeroService>();
+			services.AddScoped<RequestContext>();
 
 			services.AddMvc(options =>
 			{
@@ -32,6 +34,19 @@ namespace Slabs.AspnetCore
 			});
 		}
 
+		public void ConfigureContainer(IInjectionScope scope)
+		{
+			scope.Configure(c =>
+			{
+				//c.Export<RequestContext>().Lifestyle.SingletonPerRequest();
+				//c.Export<RequestContext>().Lifestyle.SingletonPerScope();
+				//c.Export<RequestContext>().Lifestyle.SingletonPerObjectGraph();
+				c.Export<HeroService>().As<IHeroService>();
+			});
+			scope.WhatDoIHave();
+			//scope.SetupMvc();
+		}
+
 		// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
 		public void Configure(IApplicationBuilder app, IHostingEnvironment env)
 		{
@@ -39,6 +54,9 @@ namespace Slabs.AspnetCore
 			{
 				app.UseDeveloperExceptionPage();
 			}
+
+			app.UseRequestContext();
+			app.UseMultiTenant();
 			app.UseMvc();
 
 		}

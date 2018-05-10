@@ -10,8 +10,8 @@
   "profiles": {
     "Slabs.AspnetCore": {
       "commandName": "Project",
-      "launchBrowser": true,
-      "launchUrl": "api/values",
+      "launchBrowser": false,
+      "launchUrl": "api/heroes",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

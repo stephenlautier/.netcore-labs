@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using Grace.AspNetCore.Hosting;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace Slabs.AspnetCore
@@ -13,6 +14,7 @@ namespace Slabs.AspnetCore
 		public static IWebHost BuildWebHost(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
 				.UseStartup<Startup>()
+				.UseGrace()
 				.UseUrls("http://*:5001")
 				.Build();
 	}
