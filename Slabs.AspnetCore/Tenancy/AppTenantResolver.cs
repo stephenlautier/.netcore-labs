@@ -4,7 +4,8 @@ using Slabs.AspnetCore.Infrastructure.Tenency;
 
 namespace Slabs.AspnetCore.Tenancy
 {
-	public class AppTenantResolver<TTenant> : ITenantResolver<TTenant> where TTenant : class
+	public class AppTenantResolver<TTenant> : ITenantResolver<TTenant>
+		where TTenant : class
 	{
 		private static readonly Dictionary<string, AppTenant> _domainMap = new Dictionary<string, AppTenant>
 		{

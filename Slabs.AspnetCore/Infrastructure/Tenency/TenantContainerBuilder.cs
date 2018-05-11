@@ -43,7 +43,6 @@ namespace Slabs.AspnetCore.Infrastructure.Tenency
 		public static void ConfigureTenants<TTenant>(this IInjectionScope container, Action<IExportRegistrationBlock> configure) 
 			where TTenant : class
 		{
-
 			container.Configure(c =>
 				c.ExportInstance(new TenantContainerBuilder<TTenant>(container, (tenant, config) => configure(config)))
 					.As<ITenantContainerBuilder<TTenant>>()

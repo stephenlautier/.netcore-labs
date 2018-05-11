@@ -1,7 +1,4 @@
-﻿using System;
-using System.ComponentModel;
-using Grace.DependencyInjection;
-using Grace.DependencyInjection.Extensions;
+﻿using Grace.DependencyInjection;
 using MessagePack.AspNetCoreMvcFormatter;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
@@ -53,7 +50,6 @@ namespace Slabs.AspnetCore
 					c.Export<SampleHeroService>().As<IHeroService>();
 			});
 
-			scope.WhatDoIHave();
 			//scope.SetupMvc();
 		}
 
@@ -68,7 +64,6 @@ namespace Slabs.AspnetCore
 			app.UseMultiTenant<AppTenant>();
 			app.UseRequestContext();
 			app.UseMvc();
-
 		}
 	}
 }
