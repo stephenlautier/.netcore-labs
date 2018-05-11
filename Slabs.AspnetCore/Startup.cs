@@ -1,4 +1,7 @@
-﻿using Grace.DependencyInjection;
+﻿using System;
+using System.ComponentModel;
+using Grace.DependencyInjection;
+using Grace.DependencyInjection.Extensions;
 using MessagePack.AspNetCoreMvcFormatter;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
@@ -7,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Slabs.AspnetCore.Heroes;
 using Slabs.AspnetCore.Infrastructure;
+using Slabs.AspnetCore.Tenancy;
 
 namespace Slabs.AspnetCore
 {
@@ -23,6 +27,7 @@ namespace Slabs.AspnetCore
 		public void ConfigureServices(IServiceCollection services)
 		{
 			//services.AddSingleton<IHeroService, HeroService>();
+			services.AddSingleton<ITenantRegistry, TenantRegistry>();
 			services.AddScoped<RequestContext>();
 
 			services.AddMvc(options =>
@@ -38,11 +43,15 @@ namespace Slabs.AspnetCore
 		{
 			scope.Configure(c =>
 			{
-				//c.Export<RequestContext>().Lifestyle.SingletonPerRequest();
-				//c.Export<RequestContext>().Lifestyle.SingletonPerScope();
-				//c.Export<RequestContext>().Lifestyle.SingletonPerObjectGraph();
 				c.Export<HeroService>().As<IHeroService>();
 			});
+
+			scope.ConfigureTenants<AppTenant>((tenant, c) =>
+			{
+				if (tenant.Key == "sketch7")
+					c.Export<SampleHeroService>().As<IHeroService>();
+			});
+
 			scope.WhatDoIHave();
 			//scope.SetupMvc();
 		}
@@ -55,7 +64,7 @@ namespace Slabs.AspnetCore
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseMultiTenant();
+			app.UseMultiTenant<AppTenant>();
 			app.UseRequestContext();
 			app.UseMvc();
 
