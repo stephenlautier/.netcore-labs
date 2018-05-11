@@ -23,6 +23,5 @@ namespace Slabs.AspnetCore.Tenancy
 			var host = httpContext.Request.Host.Host;
 			return Resolve(host);
 		}
-
 	}
 }
