@@ -55,8 +55,8 @@ namespace Slabs.AspnetCore
 				app.UseDeveloperExceptionPage();
 			}
 
-			app.UseRequestContext();
 			app.UseMultiTenant();
+			app.UseRequestContext();
 			app.UseMvc();
 
 		}

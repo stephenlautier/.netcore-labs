@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Slabs.AspnetCore.Infrastructure;
-using Slabs.AspnetCore.Tenant;
+using Slabs.AspnetCore.Tenancy;
 
 namespace Slabs.AspnetCore.Controllers
 {
