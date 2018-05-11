@@ -1,24 +1,24 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Grace.DependencyInjection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
-using Slabs.AspnetCore.Tenancy;
 
-namespace Slabs.AspnetCore.Tenancy
+namespace Slabs.AspnetCore.Infrastructure.Tenency
 {
 	public class MultiTenantMiddleware<TTenant> 
 		where TTenant : class 
 	{
 		private readonly RequestDelegate _next;
-		private readonly ITenantRegistry _tenantRegistry;
+		private readonly ITenantResolver<TTenant> _tenantResolver;
 
 		public MultiTenantMiddleware(
 			RequestDelegate next,
-			ITenantRegistry tenantRegistry
+			ITenantResolver<TTenant> tenantResolver
 		)
 		{
 			_next = next;
-			_tenantRegistry = tenantRegistry;
+			_tenantResolver = tenantResolver;
 		}
 
 		public async Task Invoke(
@@ -27,8 +27,7 @@ namespace Slabs.AspnetCore.Tenancy
 			Lazy<ITenantContainerBuilder<TTenant>> builder
 		)
 		{
-			var host = httpContext.Request.Host.Host;
-			var tenant = _tenantRegistry.Resolve<TTenant>(host); // todo: create Resolver which takes HTTP context
+			var tenant = _tenantResolver.Resolve(httpContext);
 
 			using (var scope = await builder.Value.BuildAsync(tenant))
 			{
@@ -37,10 +36,7 @@ namespace Slabs.AspnetCore.Tenancy
 			}
 		}
 	}
-}
 
-namespace Microsoft.AspNetCore.Builder
-{
 	public static class MultiTenantMiddlewareExtensions
 	{
 		public static IApplicationBuilder UseMultiTenant<TTenant>(this IApplicationBuilder builder) where TTenant : class

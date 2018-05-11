@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Grace.DependencyInjection;
+using Slabs.AspnetCore.Tenancy;
 
-namespace Slabs.AspnetCore.Tenancy
+namespace Slabs.AspnetCore.Infrastructure.Tenency
 {
 	public interface ITenantContainerBuilder<in TTenant> 
 		where TTenant : class

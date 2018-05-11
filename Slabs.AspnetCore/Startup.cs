@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Slabs.AspnetCore.Heroes;
 using Slabs.AspnetCore.Infrastructure;
+using Slabs.AspnetCore.Infrastructure.Tenency;
 using Slabs.AspnetCore.Tenancy;
 
 namespace Slabs.AspnetCore
@@ -27,7 +28,7 @@ namespace Slabs.AspnetCore
 		public void ConfigureServices(IServiceCollection services)
 		{
 			//services.AddSingleton<IHeroService, HeroService>();
-			services.AddSingleton<ITenantRegistry, TenantRegistry>();
+			services.AddSingleton(typeof(ITenantResolver<>), typeof(AppTenantResolver<>));
 			services.AddScoped<RequestContext>();
 
 			services.AddMvc(options =>
