@@ -68,24 +68,25 @@ namespace Slabs.AspnetCore.Tenant
 			var tenant = Tenants.ResolveByDomain(host);
 
 			var locatorScope = httpContext.RequestServices.GetService<IExportLocatorScope>();
-			
+
 			var r1 = locatorScope.Locate<RequestContext>();
 			var r2 = locatorScope.Locate<RequestContext>();
-			var scope = locatorScope.GetInjectionScope();
-			scope.Configure(c => c.ExportInstance(tenant).As<ITenant>().Lifestyle.SingletonPerRequest());
+			var injectionScope = locatorScope.GetInjectionScope();
+			//injectionScope.Configure(c => c.ExportInstance(tenant).As<ITenant>().Lifestyle.SingletonPerRequest());
 
-			//using (var scope = locatorScope.GetInjectionScope().CreateChildScope(c =>
-			//{
+			using (var scope = injectionScope.CreateChildScope(c =>
+			{
+				// todo: get tenant container services + register
+				c.ExportInstance(tenant).As<ITenant>();
+			}, "tenant"))
+			{
+				var t = scope.Locate<ITenant>();
 
-			//	c.ExportInstance(tenant).As<ITenant>();
-			//}))
-			//{
-			var t = scope.Locate<ITenant>();
-
-			httpContext.RequestServices = scope.Locate<IServiceProvider>();
-			var r3 = locatorScope.Locate<RequestContext>();
-			await _next(httpContext);
-			//}
+				httpContext.RequestServices = scope.Locate<IServiceProvider>();
+				var r3 = locatorScope.Locate<RequestContext>();
+				var r4 = scope.Locate<RequestContext>();
+				await _next(httpContext);
+			}
 		}
 
 	}
