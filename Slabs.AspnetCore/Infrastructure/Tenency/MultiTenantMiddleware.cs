@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace Slabs.AspnetCore.Infrastructure.Tenency
 {
-	public class MultiTenantMiddleware<TTenant> 
-		where TTenant : class 
+	public class MultiTenantMiddleware<TTenant>
+		where TTenant : class
 	{
 		private readonly RequestDelegate _next;
 		private readonly ITenantResolver<TTenant> _tenantResolver;

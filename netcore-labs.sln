@@ -20,21 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "root", "root", "{35FB403F-7
 		simple-docker-api\README.md = simple-docker-api\README.md
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Orleans Match History", "Orleans Match History", "{08DA5202-1453-49AA-B2FA-964C82078159}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Web", "orleans-match-history\Slabs.MatchHistory.Web\Slabs.MatchHistory.Web.csproj", "{230861D0-A54C-4032-BA2D-3492045EE019}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Contracts", "orleans-match-history\Slabs.MatchHistory.Game.Contracts\Slabs.MatchHistory.Game.Contracts.csproj", "{27D6D3A5-CBF0-4A04-B8DA-03CDA8A652A3}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Game.Grains", "orleans-match-history\Slabs.MatchHistory.Game.Grains\Slabs.MatchHistory.Game.Grains.csproj", "{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.MatchHistory.Silo", "orleans-match-history\Slabs.MatchHistory.SiloHost\Slabs.MatchHistory.Silo.csproj", "{020309F3-529D-4BB0-86E0-8736E70FFDDB}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Fody", "Fody", "{D5A9FB25-B32C-4425-A183-CDC9EB07F862}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.FodySample", "Slabs.FodySample\Slabs.FodySample.csproj", "{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Slabs.AspnetCore", "Slabs.AspnetCore\Slabs.AspnetCore.csproj", "{CBD02B61-7955-448B-8700-AA58E6A156CF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Slabs.AspnetCore", "Slabs.AspnetCore\Slabs.AspnetCore.csproj", "{CBD02B61-7955-448B-8700-AA58E6A156CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,22 +40,6 @@ Global
 		{431D3388-7323-418C-974E-375A8F54CFF4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{431D3388-7323-418C-974E-375A8F54CFF4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{431D3388-7323-418C-974E-375A8F54CFF4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{230861D0-A54C-4032-BA2D-3492045EE019}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{230861D0-A54C-4032-BA2D-3492045EE019}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{230861D0-A54C-4032-BA2D-3492045EE019}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{230861D0-A54C-4032-BA2D-3492045EE019}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27D6D3A5-CBF0-4A04-B8DA-03CDA8A652A3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27D6D3A5-CBF0-4A04-B8DA-03CDA8A652A3}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27D6D3A5-CBF0-4A04-B8DA-03CDA8A652A3}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27D6D3A5-CBF0-4A04-B8DA-03CDA8A652A3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8}.Release|Any CPU.Build.0 = Release|Any CPU
-		{020309F3-529D-4BB0-86E0-8736E70FFDDB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{020309F3-529D-4BB0-86E0-8736E70FFDDB}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{020309F3-529D-4BB0-86E0-8736E70FFDDB}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{020309F3-529D-4BB0-86E0-8736E70FFDDB}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -82,10 +56,6 @@ Global
 		{DB5CE5D7-FB9B-4503-ACDC-1AD3BB851061} = {A5AA226B-D953-40B8-BE7B-94E3E72737D2}
 		{431D3388-7323-418C-974E-375A8F54CFF4} = {A5AA226B-D953-40B8-BE7B-94E3E72737D2}
 		{35FB403F-73F0-437B-8730-4CED80FB4704} = {A5AA226B-D953-40B8-BE7B-94E3E72737D2}
-		{230861D0-A54C-4032-BA2D-3492045EE019} = {08DA5202-1453-49AA-B2FA-964C82078159}
-		{27D6D3A5-CBF0-4A04-B8DA-03CDA8A652A3} = {08DA5202-1453-49AA-B2FA-964C82078159}
-		{DA40D615-ACEC-49F3-B8EF-A01B0A5E18B8} = {08DA5202-1453-49AA-B2FA-964C82078159}
-		{020309F3-529D-4BB0-86E0-8736E70FFDDB} = {08DA5202-1453-49AA-B2FA-964C82078159}
 		{7E541E73-A780-44FB-A7A9-01CC3AB5BC2A} = {D5A9FB25-B32C-4425-A183-CDC9EB07F862}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
