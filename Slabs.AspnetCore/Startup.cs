@@ -3,6 +3,7 @@ using MessagePack.AspNetCoreMvcFormatter;
 using MessagePack.Resolvers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Slabs.AspnetCore.Heroes;
@@ -34,20 +35,20 @@ namespace Slabs.AspnetCore
 				options.OutputFormatters.Add(new MessagePackOutputFormatter(ContractlessStandardResolver.Instance));
 				//options.InputFormatters.Clear();
 				options.InputFormatters.Add(new MessagePackInputFormatter(ContractlessStandardResolver.Instance));
-			});
+			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);;
 		}
 
 		public void ConfigureContainer(IInjectionScope scope)
 		{
 			scope.Configure(c =>
 			{
-				c.Export<HeroService>().As<IHeroService>();
+				c.Export<HeroService>().As<IHeroService>().Lifestyle.Singleton();
 			});
 
 			scope.ConfigureTenants<AppTenant>((tenant, c) =>
 			{
 				if (tenant.Key == "sketch7")
-					c.Export<SampleHeroService>().As<IHeroService>();
+					c.Export<SampleHeroService>().As<IHeroService>().Lifestyle.Singleton();
 			});
 
 			//scope.SetupMvc();
@@ -60,7 +61,12 @@ namespace Slabs.AspnetCore
 			{
 				app.UseDeveloperExceptionPage();
 			}
+			else
+			{
+				app.UseHsts();
+			}
 
+			app.UseHttpsRedirection();
 			app.UseMultiTenant<AppTenant>();
 			app.UseRequestContext();
 			app.UseMvc();

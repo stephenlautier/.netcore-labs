@@ -8,14 +8,13 @@ namespace Slabs.AspnetCore
 	{
 		public static void Main(string[] args)
 		{
-			BuildWebHost(args).Run();
+			CreateWebHostBuilder(args).Build().Run();
 		}
 
-		public static IWebHost BuildWebHost(string[] args) =>
+		public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
 			WebHost.CreateDefaultBuilder(args)
-				.UseStartup<Startup>()
 				.UseGrace()
-				.UseUrls("http://*:5001")
-				.Build();
+				//.UseUrls("http://*:5001")
+				.UseStartup<Startup>();
 	}
 }

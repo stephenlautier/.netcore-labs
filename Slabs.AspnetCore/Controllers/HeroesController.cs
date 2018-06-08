@@ -8,6 +8,7 @@ using Slabs.AspnetCore.Infrastructure;
 namespace Slabs.AspnetCore.Controllers
 {
 	[Route("api/[controller]")]
+	[ApiController]
 	public class HeroesController : Controller
 	{
 		private readonly IHeroService _service;

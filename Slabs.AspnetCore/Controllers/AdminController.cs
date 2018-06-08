@@ -5,6 +5,7 @@ using Slabs.AspnetCore.Tenancy;
 namespace Slabs.AspnetCore.Controllers
 {
 	[Route("api/[controller]")]
+	[ApiController]
 	public class AdminController : Controller
 	{
 		private readonly ITenant _tenant;

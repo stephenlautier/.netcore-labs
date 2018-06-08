@@ -1,18 +1,18 @@
-FROM microsoft/aspnetcore:2.0-nanoserver-1709 AS base
+FROM microsoft/dotnet:2.1-aspnetcore-runtime AS base
 WORKDIR /app
-EXPOSE 80
+EXPOSE 5001
+EXPOSE 5443
 
-FROM microsoft/aspnetcore-build:2.0-nanoserver-1709 AS build
+FROM microsoft/dotnet:2.1-sdk AS build
 WORKDIR /src
-COPY *.sln ./
 COPY Slabs.AspnetCore/Slabs.AspnetCore.csproj Slabs.AspnetCore/
-RUN dotnet restore
+RUN dotnet restore Slabs.AspnetCore/Slabs.AspnetCore.csproj
 COPY . .
 WORKDIR /src/Slabs.AspnetCore
-RUN dotnet build -c Release -o /app
+RUN dotnet build Slabs.AspnetCore.csproj -c Release -o /app
 
 FROM build AS publish
-RUN dotnet publish -c Release -o /app
+RUN dotnet publish Slabs.AspnetCore.csproj -c Release -o /app
 
 FROM base AS final
 WORKDIR /app

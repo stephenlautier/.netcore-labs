@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <DockerComposeProjectPath>..\simple-docker-api\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 
@@ -10,9 +10,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grace.AspNetCore.Hosting" Version="6.3.0" />
-    <PackageReference Include="MessagePack.AspNetCoreMvcFormatter" Version="1.7.3.4" />
-    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
+    <PackageReference Include="Grace.AspNetCore.Hosting" Version="6.3.1" />
+    <PackageReference Include="MessagePack.AspNetCoreMvcFormatter" Version="1.7.3" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0" />
   </ItemGroup>
 
   <ItemGroup>
