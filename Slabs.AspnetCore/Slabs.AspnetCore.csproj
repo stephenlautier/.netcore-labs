@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="Grace.AspNetCore.Hosting" Version="6.3.1" />
     <PackageReference Include="MessagePack.AspNetCoreMvcFormatter" Version="1.7.3" />
-    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.0" />
+    <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.2" />
   </ItemGroup>
 
   <ItemGroup>
