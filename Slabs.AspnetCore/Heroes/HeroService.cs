@@ -74,6 +74,12 @@ namespace Slabs.AspnetCore.Heroes
 		private readonly ICollection<Hero> _data = new List<Hero>
 		{
 			new Hero{Key = "garrosh", Name = "Garrosh", Title = "Son of Hellscream"},
+			new Hero
+			{
+				Key = "azmodan",
+				Name = "Azmodan",
+				Title = "Lord of Sins"
+			},
 		};
 
 		public Task<ICollection<Hero>> GetAll() => Task.FromResult(_data);
