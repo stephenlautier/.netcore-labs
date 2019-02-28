@@ -19,10 +19,10 @@ namespace Slabs.AspnetCore.Tenancy
 
 	public static class Tenants
 	{
-		public static AppTenant Cerberus = new AppTenant
+		public static AppTenant Chiko = new AppTenant
 		{
-			Key = "cerberus",
-			Name = "Cerberus"
+			Key = "chiko",
+			Name = "Chiko"
 		};
 
 		public static AppTenant Sketch7 = new AppTenant

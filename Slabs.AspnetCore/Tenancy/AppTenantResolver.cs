@@ -9,7 +9,7 @@ namespace Slabs.AspnetCore.Tenancy
 	{
 		private static readonly Dictionary<string, AppTenant> _domainMap = new Dictionary<string, AppTenant>
 		{
-			["local.cerberus.io"] = Tenants.Cerberus,
+			["local.chiko.io"] = Tenants.Chiko,
 			["local.sketch7.io"] = Tenants.Sketch7,
 		};
 

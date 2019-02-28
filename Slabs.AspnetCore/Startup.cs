@@ -35,7 +35,7 @@ namespace Slabs.AspnetCore
 				options.OutputFormatters.Add(new MessagePackOutputFormatter(ContractlessStandardResolver.Instance));
 				//options.InputFormatters.Clear();
 				options.InputFormatters.Add(new MessagePackInputFormatter(ContractlessStandardResolver.Instance));
-			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_1);;
+			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);;
 		}
 
 		public void ConfigureContainer(IInjectionScope scope)
@@ -63,10 +63,11 @@ namespace Slabs.AspnetCore
 			}
 			else
 			{
+				// The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
 				app.UseHsts();
 			}
 
-			app.UseHttpsRedirection();
+			//app.UseHttpsRedirection();
 			app.UseMultiTenant<AppTenant>();
 			app.UseRequestContext();
 			app.UseMvc();
