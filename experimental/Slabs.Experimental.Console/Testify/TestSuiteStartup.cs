@@ -57,7 +57,7 @@ namespace Slabs.Experimental.ConsoleClient.Testify
 				.Register()
 
 				// common
-				.Withdentifier("common")
+				.WithIdentifier("common")
 				.WithBaseUrl("http://staging.api.cpm-odin.com:1002")
 				.Register();
 		}
