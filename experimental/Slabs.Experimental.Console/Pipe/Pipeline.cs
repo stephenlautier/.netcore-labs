@@ -35,9 +35,9 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		private readonly IPipe _pipeline;
 		private readonly PipelineOptions _defaultOptions = new PipelineOptions();
 
-		public Pipeline(IPipe pipline)
+		public Pipeline(IPipe pipeline)
 		{
-			_pipeline = pipline;
+			_pipeline = pipeline;
 		}
 
 		public Task<T> Run<T>(Func<Task<T>> action, Action<PipelineOptions> configure)

@@ -21,7 +21,7 @@ namespace Slabs.AspnetCore.Heroes
 			{
 				Key = "azmodan",
 				Name = "Azmodan",
-				Title = "Lord of Sins"
+				Title = "Lord of Sin"
 			},
 			new Hero
 			{
@@ -78,7 +78,7 @@ namespace Slabs.AspnetCore.Heroes
 			{
 				Key = "azmodan",
 				Name = "Azmodan",
-				Title = "Lord of Sins"
+				Title = "Lord of Sin"
 			},
 		};
 
