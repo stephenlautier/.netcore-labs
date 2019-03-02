@@ -1,7 +1,7 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
@@ -11,6 +11,12 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 	public class PipelineContext
 	{
 		internal Func<Task<object>> Func { get; set; }
+		public PipelineOptions Options { get; set; }
+	}
+
+	public class PipelineContext<TResult>
+	{
+		internal Func<Task<TResult>> Func { get; set; }
 		public PipelineOptions Options { get; set; }
 	}
 
@@ -27,6 +33,24 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 
 		public PipelineBuilder Create() => ActivatorUtilities.CreateInstance<PipelineBuilder>(_serviceProvider);
+	}
+
+	/// <summary>
+	/// Pipeline producer.
+	/// </summary>
+	public class PipelineBuilderFactory<TBuilder, TContext, TResult, TPipeline, TPipe>
+		where TPipe : IPipe<TContext, TResult>
+		where TContext : PipelineContext<TResult>
+		where TBuilder : PipelineBuilder<TContext, TResult, TPipeline, TPipe>
+	{
+		private readonly IServiceProvider _serviceProvider;
+
+		public PipelineBuilderFactory(IServiceProvider serviceProvider)
+		{
+			_serviceProvider = serviceProvider;
+		}
+
+		public TBuilder Create() => ActivatorUtilities.CreateInstance<TBuilder>(_serviceProvider);
 	}
 
 	public class PipelineBuilder
@@ -56,7 +80,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		/// <returns></returns>
 		public PipelineBuilder Add(Type type, params object[] args)
 		{
-			if(!typeof(IPipe).IsAssignableFrom(type))
+			if (!typeof(IPipe).IsAssignableFrom(type))
 				throw new ArgumentException($"Type '{type.FullName}' must implement {nameof(IPipe)}.", nameof(type));
 
 			_pipes.Add(new PipeConfig(type, args));
@@ -105,6 +129,84 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 	}
 
+	public class PipelineBuilder<TContext, TResult, TPipeline, TPipe>
+		where TPipe : IPipe<TContext, TResult>
+		where TContext : PipelineContext<TResult>
+	{
+		private readonly IServiceProvider _serviceProvider;
+		private readonly List<PipeConfig> _pipes = new List<PipeConfig>();
+
+		public PipelineBuilder(IServiceProvider serviceProvider)
+		{
+			_serviceProvider = serviceProvider;
+		}
+
+		/// <summary>
+		/// Add pipe middleware, they will execute according to the order they are registered.
+		/// </summary>
+		/// <param name="args">Additional arguments to be used within the pipe ctor.</param>
+		/// <returns></returns>
+		public PipelineBuilder<TContext, TResult, TPipeline, TPipe> Add<T>(params object[] args)
+			where T : IPipe<TContext, TResult>
+			=> Add(typeof(T), args);
+
+		/// <summary>
+		/// Add pipe middleware, they will execute according to the order they are registered.
+		/// </summary>
+		/// <param name="type">Pipe type which must implements <see cref="IPipe"/>.</param>
+		/// <param name="args">Additional arguments to be used within the pipe ctor.</param>
+		/// <returns></returns>
+		public PipelineBuilder<TContext, TResult, TPipeline, TPipe> Add(Type type, params object[] args)
+		{
+			//if (!typeof(TPipe).IsAssignableFrom(type))
+			//	throw new ArgumentException($"Type '{type.FullName}' must implement {nameof(IPipe)}.", nameof(type));
+
+			_pipes.Add(new PipeConfig(type, args));
+			return this;
+		}
+
+		/// <summary>
+		/// Build configured <see cref="Pipeline"/>.
+		/// </summary>
+		/// <returns></returns>
+		public TPipeline Build()
+		{
+			if (_pipes.Count == 0)
+				throw new InvalidOperationException("Cannot build pipeline with zero pipes.");
+
+			Add<ActionExecutePipe<TContext, TResult>>();
+			IPipe<TContext, TResult> previous = default(TPipe);
+			for (int i = _pipes.Count; i-- > 0;)
+			{
+				var pipe = _pipes[i];
+				var isLast = _pipes.Count - 1 == i;
+				var isFirst = i == 0;
+
+				var next = isLast
+					? (PipeDelegate<TContext, TResult>)Stub
+					: previous.Invoke;
+
+				object[] ctor;
+				if (pipe.Args == null)
+					ctor = new object[] { next };
+				else
+				{
+					ctor = new object[pipe.Args.Length + 1];
+					ctor[0] = next;
+					Array.Copy(pipe.Args, 0, ctor, 1, pipe.Args.Length);
+				}
+
+				var instance = (IPipe<TContext, TResult>)ActivatorUtilities.CreateInstance(_serviceProvider, pipe.Type, ctor);
+				if (isFirst)
+					return ActivatorUtilities.CreateInstance<TPipeline>(_serviceProvider, instance);
+				previous = instance;
+			}
+			throw new InvalidOperationException("Something went wrong!");
+
+			Task<TResult> Stub(TContext context) => Task.FromResult(default(TResult));
+		}
+	}
+
 	/// <summary>
 	/// Action invoker pipe, which actually triggers the users defined function. Generally invoked as the last pipe.
 	/// </summary>
@@ -115,5 +217,18 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 
 		public async Task<object> Invoke(PipelineContext context) => await context.Func();
+	}
+
+	/// <summary>
+	/// Action invoker pipe, which actually triggers the users defined function. Generally invoked as the last pipe.
+	/// </summary>
+	public class ActionExecutePipe<TContext, TResult> : IPipe<TContext, TResult>
+		where TContext : PipelineContext<TResult>
+	{
+		public ActionExecutePipe(PipeDelegate<TContext, TResult> next)
+		{
+		}
+
+		public async Task<TResult> Invoke(TContext context) => await context.Func();
 	}
 }

@@ -77,5 +77,34 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			}
 			await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc, Options = options });
 		}
+	}	
+	
+	/// <summary>
+	/// Pipeline runner/executor.
+	/// </summary>
+	public class Pipeline<TContext, TResult, TPipe>
+		where TPipe : IPipe<TContext, TResult>
+		where TContext : PipelineContext<TResult>, new()
+	{
+		private readonly TPipe _pipeline;
+		private readonly PipelineOptions _defaultOptions = new PipelineOptions();
+
+		public Pipeline(TPipe pipeline)
+		{
+			_pipeline = pipeline;
+		}
+
+		public async Task<TResult> Run(Func<Task<TResult>> action, PipelineOptions options = null)
+		{
+			options = options ?? _defaultOptions;
+			async Task<TResult> ToObjectFunc()
+			{
+				var r = await action();
+				return r;
+			}
+
+			var result = await _pipeline.Invoke(new TContext { Func = ToObjectFunc, Options = options });
+			return result;
+		}
 	}
 }
