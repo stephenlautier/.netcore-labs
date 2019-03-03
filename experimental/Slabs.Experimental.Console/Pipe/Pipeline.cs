@@ -52,8 +52,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 			options = options ?? _defaultOptions;
 			async Task<object> ToObjectFunc()
 			{
-				var r = await action();
-				return r;
+				return await action();
 			}
 
 			var result = await _pipeline.Invoke(new PipelineContext { Func = ToObjectFunc, Options = options });

@@ -1,12 +1,19 @@
 using System;
+using System.Diagnostics;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
 	/// <summary>
 	/// Pipe registry config.
 	/// </summary>
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class PipeConfig
 	{
+		/// <summary>
+		/// Debugger display.
+		/// </summary>
+		protected string DebuggerDisplay => $"Type: '{Type}', Args: '{Args}'";
+
 		/// <summary>
 		/// Get or set the pipe type to register.
 		/// </summary>
@@ -21,7 +28,7 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		{
 		}
 
-		public PipeConfig(Type type, object[] args)
+		public PipeConfig(Type type, object[] args = null)
 		{
 			Type = type;
 			Args = args;

@@ -1,15 +1,23 @@
-using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Slabs.Experimental.ConsoleClient.Pipe
 {
 	/// <summary>
 	/// Represents a method invocation.
 	/// </summary>
+	[DebuggerDisplay("{DebuggerDisplay,nq}")]
 	public class PipelineContext
 	{
+		/// <summary>
+		/// Debugger display.
+		/// </summary>
+		protected string DebuggerDisplay => $"Options: {{ {Options} }}";
+
 		internal Func<Task<object>> Func { get; set; }
 		public PipelineOptions Options { get; set; }
 	}
@@ -43,7 +51,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		/// Add pipe middleware, they will execute according to the order they are registered.
 		/// </summary>
 		/// <param name="args">Additional arguments to be used within the pipe ctor.</param>
-		/// <returns></returns>
 		public PipelineBuilder Add<T>(params object[] args)
 			where T : IPipe
 			=> Add(typeof(T), args);
@@ -53,10 +60,9 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		/// </summary>
 		/// <param name="type">Pipe type which must implements <see cref="IPipe"/>.</param>
 		/// <param name="args">Additional arguments to be used within the pipe ctor.</param>
-		/// <returns></returns>
 		public PipelineBuilder Add(Type type, params object[] args)
 		{
-			if(!typeof(IPipe).IsAssignableFrom(type))
+			if (!typeof(IPipe).IsAssignableFrom(type))
 				throw new ArgumentException($"Type '{type.FullName}' must implement {nameof(IPipe)}.", nameof(type));
 
 			_pipes.Add(new PipeConfig(type, args));
@@ -64,44 +70,61 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 		}
 
 		/// <summary>
+		/// Adds a collection from pipes configs.
+		/// </summary>
+		/// <param name="pipes">Pipe configs to add.</param>
+		public PipelineBuilder AddRange(IEnumerable<PipeConfig> pipes)
+		{
+			_pipes.AddRange(pipes);
+			return this;
+		}
+
+		/// <summary>
+		/// Get all pipes configs.
+		/// </summary>
+		public IEnumerable<PipeConfig> GetAll() => _pipes.AsReadOnly();
+
+		/// <summary>
 		/// Build configured <see cref="Pipeline"/>.
 		/// </summary>
-		/// <returns></returns>
 		public Pipeline Build()
 		{
 			if (_pipes.Count == 0)
 				throw new InvalidOperationException("Cannot build pipeline with zero pipes.");
 
-			Add<ActionExecutePipe>();
+			var pipes = _pipes.ToList();
+			pipes.Add(new PipeConfig(typeof(ActionExecutePipe)));
+
 			IPipe previous = null;
-			for (int i = _pipes.Count; i-- > 0;)
+			for (int i = pipes.Count; i-- > 0;)
 			{
-				var pipe = _pipes[i];
-				var isLast = _pipes.Count - 1 == i;
+				var pipe = pipes[i];
+				var isLast = pipes.Count - 1 == i;
 				var isFirst = i == 0;
 
-				PipeDelegate next = isLast
-					? (PipeDelegate)Stub
-					: previous.Invoke;
-
 				object[] ctor;
-				if (pipe.Args == null)
-					ctor = new object[] { next };
-				else
+				if (!isLast)
 				{
-					ctor = new object[pipe.Args.Length + 1];
-					ctor[0] = next;
-					Array.Copy(pipe.Args, 0, ctor, 1, pipe.Args.Length);
-				}
+					PipeDelegate next = previous.Invoke;
 
-				IPipe instance = (IPipe)ActivatorUtilities.CreateInstance(_serviceProvider, pipe.Type, ctor);
+					if (pipe.Args == null)
+						ctor = new object[] { next };
+					else
+					{
+						const int additionalCtorArgs = 1;
+						ctor = new object[pipe.Args.Length + additionalCtorArgs];
+						ctor[0] = next;
+						Array.Copy(pipe.Args, 0, ctor, additionalCtorArgs, pipe.Args.Length);
+					}
+				}
+				else
+					ctor = new object[] { };
+				var instance = (IPipe)ActivatorUtilities.CreateInstance(_serviceProvider, pipe.Type, ctor);
 				if (isFirst)
 					return new Pipeline(instance);
 				previous = instance;
 			}
-			throw new InvalidOperationException("Something went wrong!");
-
-			Task<object> Stub(PipelineContext context) => Task.FromResult<object>(null);
+			throw new InvalidOperationException("Pipeline was not build correctly!");
 		}
 	}
 
@@ -110,10 +133,6 @@ namespace Slabs.Experimental.ConsoleClient.Pipe
 	/// </summary>
 	public class ActionExecutePipe : IPipe
 	{
-		public ActionExecutePipe(PipeDelegate next)
-		{
-		}
-
 		public async Task<object> Invoke(PipelineContext context) => await context.Func();
 	}
 }
