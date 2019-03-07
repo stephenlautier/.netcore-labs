@@ -35,7 +35,7 @@ namespace Slabs.AspnetCore
 				options.OutputFormatters.Add(new MessagePackOutputFormatter(ContractlessStandardResolver.Instance));
 				//options.InputFormatters.Clear();
 				options.InputFormatters.Add(new MessagePackInputFormatter(ContractlessStandardResolver.Instance));
-			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);;
+			}).SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
 		}
 
 		public void ConfigureContainer(IInjectionScope scope)
